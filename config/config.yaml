@@ -1,0 +1,7 @@
+datasource:
+  url: ${MONGODB_URL:localhost:27017}
+  username: ${MONGODB_USERNAME:t}
+  password: ${MONGODB_PASSWORD:}
+
+web:
+  port: ${WEB_PORT:8080}
