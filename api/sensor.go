@@ -4,20 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
 
 type WeatherResponse struct {
-	Location struct {
-		LocalTime string `json:"localtime"`
-	} `json:"location"`
-	Current struct {
-		Temperature int `json:"temperature"`
-		WindSpeed   int `json:"wind_speed"`
-		Humidity    int `json:"humidity"`
-	} `json:"current"`
+	Location map[string]interface{} `json:"location"`
+	Current  map[string]interface{} `json:"current"`
 }
 
 func init() {
@@ -26,30 +19,48 @@ func init() {
 	}
 }
 
-func FetchWeatherData(city string) (*WeatherResponse, error) {
+func FetchWeatherData(city string, measurement string) (int, string, error) {
 	apiKey, exists := os.LookupEnv("WEATHER_API_KEY")
+	if !exists {
+		return 0, "", fmt.Errorf("API key not set in environment")
+	}
+
 	apiUrl, exists := os.LookupEnv("WEATHER_URL")
 	if !exists {
-		return nil, fmt.Errorf("API key not set in environment")
+		return 0, "", fmt.Errorf("API URL not set in environment")
 	}
 
 	url := fmt.Sprintf(apiUrl, apiKey, city)
-
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return 0, "", err
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	var weatherData WeatherResponse
-	if err := json.Unmarshal(body, &weatherData); err != nil {
-		return nil, err
+	if err := json.NewDecoder(resp.Body).Decode(&weatherData); err != nil {
+		return 0, "", err
 	}
 
-	return &weatherData, nil
+	measureValue, ok := weatherData.Current[measurement]
+	if !ok {
+		return 0, "", fmt.Errorf("measurement not found")
+	}
+
+	measureValueInt, ok := measureValue.(float64)
+	if !ok {
+		return 0, "", fmt.Errorf("measurement is not a float64")
+	}
+
+	localTime, ok := weatherData.Location["localtime"]
+	if !ok {
+		return 0, "", fmt.Errorf("localtime not found")
+	}
+
+	localTimeString, ok := localTime.(string)
+	if !ok {
+		return 0, "", fmt.Errorf("localtime is not a string")
+	}
+
+	return int(measureValueInt), localTimeString, nil
 }
