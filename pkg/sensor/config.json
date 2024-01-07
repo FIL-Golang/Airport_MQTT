@@ -1,0 +1,15 @@
+{
+  "sensors": [
+    {
+      "id": 123,
+      "AirportCode": "CDG",
+      "Measurement": "Temperature"
+    }
+  ],
+  "mqttConfig": {
+    "brokerAddress": "mqtt.com",
+    "brokerPort": 1883,
+    "qos": 0,
+    "clientId": 123
+  }
+}
