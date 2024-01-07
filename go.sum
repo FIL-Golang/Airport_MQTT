@@ -1,0 +1,4 @@
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/krisukox/google-flights-api v0.0.0-20230813161150-e4ed51b40bb4 h1:Xh9SlCxUZkmDVHfvAJxbxnxFlA3MArVGukcJ7bqCCK8=
+github.com/krisukox/google-flights-api v0.0.0-20230813161150-e4ed51b40bb4/go.mod h1:KnHH2wqiQGbyX6eZpBpu5kQ/SBgJ92w+jw8SSG6BuWY=
