@@ -26,3 +26,4 @@ go.work
 
 # Mosquitto Container
 mosquitto/data
+/mongo/
