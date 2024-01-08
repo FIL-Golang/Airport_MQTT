@@ -1,32 +1,62 @@
 package sensor
 
 import (
-	"Airport_MQTT/api"
+	"fmt"
+	"github.com/krisukox/google-flights-api/iata"
 	"time"
 )
 
+type MeasurementData struct {
+	TypeMeasure string
+	Value       *float64
+	Timestamp   string
+}
+
+type SensorInterface interface {
+	StartSensor()
+	SendToBroker(measureData MeasurementData)
+	getDataApi(measure string, city string) MeasurementData
+}
+
 type Sensor struct {
-	SensorID    int
-	ConfigID    int
-	AirportCode string
+	SensorInterface
+	SensorID    string
+	BrokerID    string
+	IataCode    string
 	Measurement string
-	Value       float64
-	Timestamp   time.Time
 	Frequency   int
 }
 
-func StartCaptureData(city string, measurement string, frequency int, dataChannel chan<- float64) {
-	ticker := time.NewTicker(time.Second * time.Duration(frequency))
+func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string, measurement string, frequency int) Sensor {
+	return Sensor{
+		SensorID:        sensorId,
+		BrokerID:        "1", //NewBrokerId(),
+		IataCode:        iataCode,
+		Measurement:     measurement,
+		Frequency:       frequency,
+		SensorInterface: sensorInterface,
+	}
+}
+
+func (s Sensor) SendToBroker(data MeasurementData) {
+	//s.BrokerID.SendMessage()
+	fmt.Println(data)
+}
+
+func (s Sensor) StartSensor() {
+	location := iata.IATATimeZone(s.IataCode)
+	if location.City == "" {
+		fmt.Println("IATA not supported : ", s.IataCode)
+		return
+	}
+
+	ticker := time.NewTicker(time.Duration(s.Frequency) * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			measureValue, _, err := api.FetchWeatherData(city, measurement)
-			if err != nil {
-				continue
-			}
-			dataChannel <- float64(measureValue)
+			s.SendToBroker(s.getDataApi(s.Measurement, location.City))
 		}
 	}
 }

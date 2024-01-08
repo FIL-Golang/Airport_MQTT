@@ -1,42 +1,26 @@
 package main
 
 import (
-	sensor2 "Airport_MQTT/internal/sensor"
-	"encoding/json"
-	"fmt"
-	"os"
+	"Airport_MQTT/internal/sensor"
 )
 
-type SensorData struct {
-	Sensors    []sensor2.Sensor `json:"sensors"`
-	MQTTConfig sensor2.Config   `json:"mqttConfig"`
-}
-
 func main() {
-	configFile, err := os.ReadFile("internal/sensor/data.json")
+	/*if len(os.Args) < 5 {
+		panic("Usage: main <sensorId> <iataCode> <measurement> <frequency>")
+	}
+
+	sensorId := os.Args[1]
+	iataCode := os.Args[2]
+	measurement := os.Args[3]
+	frequencyStr := os.Args[4]
+
+	frequency, err := strconv.Atoi(frequencyStr)
 	if err != nil {
-		fmt.Println("Erreur lors de la lecture du fichier de sensor:", err)
-		return
+		panic("Frequency must be an integer")
 	}
 
-	var sensorData SensorData
-	if err := json.Unmarshal(configFile, &sensorData); err != nil {
-		fmt.Println("Erreur lors du parsing du fichier de données sensor:", err)
-		return
-	}
+	mySensor := sensor.NewSensor(nil, sensorId, iataCode, measurement, frequency)*/
+	mySensor := sensor.NewSensor(nil, "1", "CDG", "wind_speed", 2)
 
-	for _, sc := range sensorData.Sensors {
-		go func(sc sensor2.Sensor) {
-			dataChannel := make(chan float64)
-
-			go sensor2.StartCaptureData(sc.AirportCode, sc.Measurement, sc.Frequency, dataChannel)
-
-			for data := range dataChannel {
-				fmt.Printf("%s: %f\n", sc.Measurement, data)
-			}
-		}(sc)
-	}
-
-	fmt.Println("Appuyez sur 'Enter' pour arrêter.")
-	fmt.Scanln()
+	mySensor.StartSensor()
 }
