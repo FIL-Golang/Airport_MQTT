@@ -16,7 +16,7 @@ func SensorNatureFromInt(nature int) string {
 	case Pressure:
 		return "pressure"
 	case WindSpeed:
-		return "wind speed"
+		return "wind_speed"
 	default:
 		return ""
 	}
@@ -28,7 +28,7 @@ func SensorNatureFromString(nature string) int {
 		return Temperature
 	case "pressure":
 		return Pressure
-	case "wind speed":
+	case "wind_speed":
 		return WindSpeed
 	default:
 		return -1
