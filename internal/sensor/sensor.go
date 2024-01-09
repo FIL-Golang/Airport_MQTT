@@ -39,8 +39,14 @@ func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string
 }
 
 func (s Sensor) SendToBroker(data MeasurementData) {
-	//s.BrokerID.SendMessage()
-	fmt.Println(data)
+	var valueStr string
+	if data.Value != nil {
+		valueStr = fmt.Sprintf("%v", *data.Value)
+	} else {
+		valueStr = "nil"
+	}
+
+	fmt.Printf("TypeMeasure: %s, Value: %s, Timestamp: %s\n", data.TypeMeasure, valueStr, data.Timestamp)
 }
 
 func (s Sensor) StartSensor() {

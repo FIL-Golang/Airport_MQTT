@@ -2,10 +2,12 @@ package main
 
 import (
 	"Airport_MQTT/internal/sensor"
+	"os"
+	"strconv"
 )
 
 func main() {
-	/*if len(os.Args) < 5 {
+	if len(os.Args) < 5 {
 		panic("Usage: main <sensorId> <iataCode> <measurement> <frequency>")
 	}
 
@@ -19,8 +21,6 @@ func main() {
 		panic("Frequency must be an integer")
 	}
 
-	mySensor := sensor.NewSensor(nil, sensorId, iataCode, measurement, frequency)*/
-	mySensor := sensor.NewSensor(nil, "1", "CDG", "wind_speed", 2)
-
+	mySensor := sensor.NewSensor(nil, sensorId, iataCode, measurement, frequency)
 	mySensor.StartSensor()
 }
