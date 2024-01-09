@@ -3,6 +3,7 @@ package mqttUtils
 import (
 	"Airport_MQTT/internal/model"
 	"Airport_MQTT/internal/utils"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"strings"
 )
@@ -23,9 +24,11 @@ func NewParser() Parser {
 }
 
 func (p *parser) parseTopic(message mqtt.Message) {
+	fmt.Println(message.Topic())
+
 	splitTopic := strings.Split(message.Topic(), "/")
-	p.sensorId = splitTopic[4]
-	p.sensorType = model.SensorNatureFromString(splitTopic[3])
+	p.sensorId = splitTopic[5]
+	p.sensorType = model.SensorNatureFromString(splitTopic[4])
 	p.airportIATA = splitTopic[2]
 }
 
