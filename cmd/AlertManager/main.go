@@ -13,13 +13,11 @@ func main() {
 	}
 	fmt.Println("Connected to MQTT broker")
 
-	fmt.Println("Connecting to MongoDB...")
-	mqttHandler := mqttUtils.NewDatabaseRecorderMqttHandler()
-	fmt.Println("Connected to MongoDB")
+	mqttHandler := mqttUtils.NewAlertManagerMqttHandler()
 
-	fmt.Println("Subscribing to topic...")
+	fmt.Println("Subscribing to sensors topics...")
 	mqttClient.Subscribe("/airports/+/sensors/+/+", 0, mqttHandler.HandleValue)
-	fmt.Println("Subscribed to topic airports/+/sensors/+/+")
+	fmt.Println("Subscribed to sensors topics airports/+/sensors/+/+")
 
 	select {}
 }

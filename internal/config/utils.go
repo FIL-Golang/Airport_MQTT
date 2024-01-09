@@ -6,20 +6,19 @@ import (
 	"regexp"
 )
 
-func LoadConfig() Config {
-	yamlFile, err := os.ReadFile("config/config.yaml")
-	cfg := Config{}
+func LoadConfig(configType interface{}, configFileName string) interface{} {
+	yamlFile, err := os.ReadFile("config/" + configFileName)
 
 	re := regexp.MustCompile(`\${([^:}]+)[^}]*}`)
 	yamlFile = []byte(re.ReplaceAllStringFunc(string(yamlFile), replaceByEnvVar))
 
-	err = yaml.Unmarshal(yamlFile, &cfg)
+	err = yaml.Unmarshal(yamlFile, configType)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return cfg
+	return configType
 }
 
 func replaceByEnvVar(match string) string {
