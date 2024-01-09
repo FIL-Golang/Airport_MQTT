@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 type SensorFileRecorder interface {
-	Store(data model.SensorData) (savedData model.SensorData, err error)
+	Store(data model.SensorData) (err error)
 }
 
 type sensorFileRecorder struct {
@@ -23,30 +22,29 @@ func NewSensorFileRecorder() SensorFileRecorder {
 	}
 }
 
-func (r *sensorFileRecorder) Store(data model.SensorData) (savedData model.SensorData, err error) {
+func (r *sensorFileRecorder) Store(data model.SensorData) (err error) {
 	err = writeSensorData(data)
 	if err != nil {
-		return data, err
+		return err
 	}
-	return data, nil
+	return nil
 }
 
 func writeSensorData(data model.SensorData) error {
 	// Construire le chemin du dossier records pour l'aéroport
-	airportDir := filepath.Join("records", data.CodeIATA)
+	airportDir := filepath.Join("records", data.AirportIATA)
 	if err := os.MkdirAll(airportDir, os.ModePerm); err != nil {
 		return err
 	}
 
 	// Construire le chemin du dossier pour le type de donnée
-	dataTypeDir := filepath.Join(airportDir, model.SensorNatureFromInt(data.Nature))
+	dataTypeDir := filepath.Join(airportDir, data.Nature.String())
 	if err := os.MkdirAll(dataTypeDir, os.ModePerm); err != nil {
 		return err
 	}
 
 	// Construire le chemin complet du fichier CSV
-	dateString := data.Timestamp.Format("2006-01-02")
-	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s.csv", dateString))
+	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s.csv", data.Timestamp))
 
 	// Ouvrir le fichier CSV en mode append ou créer s'il n'existe pas encore
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -70,7 +68,7 @@ func writeSensorData(data model.SensorData) error {
 	}
 
 	// Écrire les données dans le fichier CSV
-	row := []string{data.Timestamp.Format(time.RFC3339), fmt.Sprintf("%.2f", data.Value)}
+	row := []string{data.Timestamp, fmt.Sprintf("%.2f", data.Value)}
 	writer.Write(row)
 
 	return nil
