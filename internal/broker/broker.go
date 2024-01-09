@@ -1,7 +1,7 @@
 package broker
 
 import (
-	"Airport_MQTT/internal/config"
+	"Airport_MQTT/internal/config/types"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"os"
@@ -11,7 +11,7 @@ type Broker struct {
 	client mqtt.Client
 }
 
-func NewBroker(cfg *config.Config) Broker {
+func NewBroker(cfg *types.ConfigFile) Broker {
 	brokerURL := cfg.Mqtt.Url
 
 	options := mqtt.NewClientOptions().AddBroker(brokerURL)

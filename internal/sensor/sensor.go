@@ -3,6 +3,7 @@ package sensor
 import (
 	"Airport_MQTT/internal/broker"
 	"Airport_MQTT/internal/config"
+	"Airport_MQTT/internal/config/types"
 	"fmt"
 	"github.com/krisukox/google-flights-api/iata"
 	"time"
@@ -30,10 +31,10 @@ type Sensor struct {
 }
 
 func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string, measurement string, frequency int) Sensor {
-	cfg := config.LoadConfig()
+	cfg := config.LoadConfig(&types.ConfigFile{}, "config.yaml").(*types.ConfigFile)
 	return Sensor{
 		SensorID:        sensorId,
-		BrokerID:        broker.NewBroker(&cfg),
+		BrokerID:        broker.NewBroker(cfg),
 		IataCode:        iataCode,
 		Measurement:     measurement,
 		Frequency:       frequency,
