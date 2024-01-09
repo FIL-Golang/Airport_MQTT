@@ -18,8 +18,8 @@ func main() {
 	fmt.Println("Connected to MongoDB")
 
 	fmt.Println("Subscribing to topic...")
-	mqttClient.Subscribe("/airports/+/+/+", 0, mqttHandler.HandleValue)
-	fmt.Println("Subscribed to topic airports/+/+/+")
+	mqttClient.Subscribe("/airports/+/sensors/+/+", 0, mqttHandler.HandleValue)
+	fmt.Println("Subscribed to topic airports/+/sensors/+/+")
 
 	select {}
 
