@@ -1,6 +1,6 @@
-package config
+package types
 
-type Config struct {
+type ConfigFile struct {
 	Name string `yaml:"name"`
 
 	Datasource struct {

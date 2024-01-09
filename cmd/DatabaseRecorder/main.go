@@ -22,5 +22,4 @@ func main() {
 	fmt.Println("Subscribed to topic airports/+/sensors/+/+")
 
 	select {}
-
 }
