@@ -11,7 +11,7 @@ const (
 type SensorData struct {
 	SensorId  string  // format: <uuid>
 	CodeIATA  string  // format: <3 letters>
-	Nature    int     // 0: temperature, 1: pressure, 2: wind speed
+	Nature    string  // 0: temperature, 1: pressure, 2: wind speed
 	Value     float32 // value of the sensor
 	Timestamp time.Time
 }
