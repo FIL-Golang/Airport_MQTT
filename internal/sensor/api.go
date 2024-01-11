@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,7 +35,12 @@ func (s *Sensor) fetchWeatherData(city string) (WeatherResponse, error) {
 	if err != nil {
 		return WeatherResponse{}, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
 
 	var weatherData WeatherResponse
 	err = json.NewDecoder(resp.Body).Decode(&weatherData)
