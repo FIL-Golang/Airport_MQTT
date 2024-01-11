@@ -3,11 +3,17 @@ package config
 import (
 	"gopkg.in/yaml.v2"
 	"os"
+	"path/filepath"
 	"regexp"
+	"runtime"
 )
 
 func LoadConfig(configType interface{}, configFileName string) interface{} {
-	yamlFile, err := os.ReadFile("config/" + configFileName)
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+
+	// FIXME call function to handle paths
+	yamlFile, err := os.ReadFile(basepath + "/../../" + "config/" + configFileName)
 
 	re := regexp.MustCompile(`\${([^:}]+)[^}]*}`)
 	yamlFile = []byte(re.ReplaceAllStringFunc(string(yamlFile), replaceByEnvVar))

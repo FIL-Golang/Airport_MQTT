@@ -6,6 +6,8 @@ import (
 	"github.com/joho/godotenv"
 	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -15,7 +17,10 @@ type WeatherResponse struct {
 }
 
 func init() {
-	if err := godotenv.Load(); err != nil {
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	err := godotenv.Load(filepath.Join(basepath, "../../.env"))
+	if err != nil {
 		fmt.Println("No .env file found")
 	}
 }

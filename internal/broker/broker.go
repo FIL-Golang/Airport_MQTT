@@ -16,7 +16,6 @@ func NewBroker(cfg *types.ConfigFile) Broker {
 
 	options := mqtt.NewClientOptions().AddBroker(brokerURL)
 	client := mqtt.NewClient(options)
-
 	if request := client.Connect(); request.Wait() && request.Error() != nil {
 		fmt.Println("MQTT connexion error : ", request.Error())
 		os.Exit(1)
