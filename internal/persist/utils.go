@@ -2,16 +2,22 @@ package persist
 
 import (
 	"Airport_MQTT/internal/config"
-	"Airport_MQTT/internal/config/types"
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewMongoClient() *mongo.Client {
-	conf := config.LoadConfig(&types.ConfigFile{}, "config.yaml").(*types.ConfigFile)
+	datasourceConfig := config.GetDatasourceConfig()
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(conf.Datasource.Url))
+	clientOptions := options.Client()
+	clientOptions.ApplyURI(datasourceConfig.Url)
+	//clientOptions.SetAuth(options.Credential{ //TODO : implement option to connect to with credentials
+	//	Username: datasourceConfig.Username,
+	//	Password: datasourceConfig.Password,
+	//})
+
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		panic(err)
 	}
