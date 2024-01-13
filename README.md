@@ -4,11 +4,6 @@
 WEATHER_URL="http://api.weatherstack.com/"
 WEATHER_API_KEY=
 
-## To start new sensor without config file
-make build
-
-./sensor \sensorId\ \IATACode\ \measure\ \frequency\
-
 ### Measure Example : 
     - wind_speed
     - temperature
@@ -20,10 +15,10 @@ make build
     - uv_index
 
 ## To start new sensor with config file
-cd cmd/sensorConfig
+cd cmd/sensor
 
 go build -o name_measure/name_exe
 
 cd name_measure
 
-./name_exe --config=./configFile.json
+./name_exe --config=./config_file.json
