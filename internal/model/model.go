@@ -15,8 +15,8 @@ type SensorData struct {
 	SensorId    string  // format: <uuid>
 	AirportIATA string  // format: <3 letters>
 	Nature      Nature  // 0: temperature, 1: pressure, 2: wind speed
-	Value       float32 // value of the sensor
-	Timestamp   time.Time
+	Value       float64 // value of the sensor
+	Timestamp   string
 }
 
 // Sensor is the data that we return from the API

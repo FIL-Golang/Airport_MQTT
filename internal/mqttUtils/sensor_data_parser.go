@@ -9,7 +9,7 @@ import (
 )
 
 type payload struct {
-	Value     float32 `json:"value"`
+	Value     float64 `json:"value"`
 	Timestamp string  `json:"timestamp"`
 }
 
@@ -49,30 +49,25 @@ func parsePayload(message mqtt.Message, data *model.SensorData) error {
 		return nil
 	}
 	data.Value = pay.Value
-	data.Timestamp, err = convertStringToTime(pay.Timestamp)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func getTopic(sensorData model.SensorData, typ string) string {
+func GetTopic(sensorData model.SensorData, typ string) string {
 	return "/airports/" + sensorData.AirportIATA + "/" + typ + "/" + sensorData.Nature.String() + "/" + sensorData.SensorId
 }
 
 func GetSensorsTopic(sensor model.SensorData) string {
-	return getTopic(sensor, "sensors")
+	return GetTopic(sensor, "sensors")
 }
 
 func GetAlertsTopic(sensor model.SensorData) string {
-	return getTopic(sensor, "alerts")
+	return GetTopic(sensor, "alerts")
 }
 
 func GetPayload(reading model.SensorData) []byte {
 	pay := payload{
 		Value:     reading.Value,
-		Timestamp: reading.Timestamp.Format("2006-01-02-15-04-05"),
+		Timestamp: reading.Timestamp,
 	}
 	bytePayload, _ := json.Marshal(pay)
 	return bytePayload
