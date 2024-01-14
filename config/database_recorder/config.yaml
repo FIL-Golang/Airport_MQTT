@@ -1,0 +1,13 @@
+datasource:
+  url: mongodb://localhost:27017
+  username:
+  password:
+
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+    username:
+    password:
+  client:
+    id: database_recorder
+
