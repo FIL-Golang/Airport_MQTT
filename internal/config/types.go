@@ -38,9 +38,11 @@ type SensorConfig struct {
 	AirportIATA string `yaml:"airportIATA" env:"SENSOR_AIRPORT_IATA" validate:"required"`
 	DeviceId    string `yaml:"deviceId" env:"SENSOR_DEVICE_ID"`
 	SensorType  string `yaml:"sensorType" env:"SENSOR_TYPE"`
+	Frequency   int    `yaml:"frequency" env:"SENSOR_FREQUENCY"`
 }
 
 type APIConfig struct {
+	Url       string `yaml:"url" env:"API_URL"`
 	SecretKey string `yaml:"secretKey" env:"API_SECRET_KEY"`
 }
 

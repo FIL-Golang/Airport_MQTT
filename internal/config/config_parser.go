@@ -74,3 +74,11 @@ func GetMqttConfig() MqttConfig {
 func GetAlerts() []Alert { //TODO : same
 	return config.Alerts
 }
+
+func GetSensorConfig() SensorConfig {
+	return config.Sensor
+}
+
+func GetApiConfig() APIConfig {
+	return config.API
+}

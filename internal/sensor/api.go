@@ -1,14 +1,12 @@
 package sensor
 
 import (
+	"Airport_MQTT/internal/config"
+	"Airport_MQTT/internal/model"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 )
 
@@ -17,19 +15,9 @@ type WeatherResponse struct {
 	Current  map[string]interface{} `json:"current"`
 }
 
-func init() {
-	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(b)
-	err := godotenv.Load(filepath.Join(basepath, "../../.env"))
-	if err != nil {
-		fmt.Println("No .env file found")
-	}
-}
-
 func (s *Sensor) fetchWeatherData(city string) (WeatherResponse, error) {
-	apiKey, _ := os.LookupEnv("WEATHER_API_KEY")
-	apiUrl, _ := os.LookupEnv("WEATHER_URL")
-	url := fmt.Sprintf(apiUrl, apiKey, city)
+	apiConfig := config.GetApiConfig()
+	url := fmt.Sprintf(apiConfig.Url, apiConfig.SecretKey, city)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -51,25 +39,24 @@ func (s *Sensor) fetchWeatherData(city string) (WeatherResponse, error) {
 	return weatherData, nil
 }
 
-func (s *Sensor) processWeatherData(weatherData WeatherResponse, measurement string) MeasurementData {
-	measureValue, ok := weatherData.Current[measurement]
+func (s *Sensor) processWeatherData(weatherData WeatherResponse, measurement string) model.SensorData {
+	measureValue, ok := weatherData.Current[measurement].(float64)
 	if !ok {
-		return MeasurementData{TypeMeasure: measurement, Value: nil, Timestamp: time.Now().Format(time.RFC3339)}
+		return model.SensorData{}
 	}
-
-	value, isFloat := measureValue.(float64)
-	if !isFloat {
-		return MeasurementData{TypeMeasure: measurement, Value: nil, Timestamp: time.Now().Format(time.RFC3339)}
+	return model.SensorData{
+		SensorId:    s.DeviceId,
+		AirportIATA: s.AirportIATA,
+		Nature:      model.SensorNatureFromString(s.Type),
+		Value:       measureValue,
+		Timestamp:   time.Now().Format("2006-01-02-15-04-05"),
 	}
-
-	return MeasurementData{TypeMeasure: measurement, Value: &value, Timestamp: time.Now().Format(time.RFC3339)}
 }
 
-func (s *Sensor) getDataApi(measurement string, city string) MeasurementData {
+func (s *Sensor) getDataApi(measurement string, city string) model.SensorData {
 	weatherData, err := s.fetchWeatherData(city)
 	if err != nil {
-		return MeasurementData{TypeMeasure: measurement, Value: nil, Timestamp: time.Now().Format(time.RFC3339)}
+		return model.SensorData{}
 	}
-
 	return s.processWeatherData(weatherData, measurement)
 }
