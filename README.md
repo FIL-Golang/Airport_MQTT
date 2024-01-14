@@ -23,11 +23,21 @@ datasource:
 
 mqtt:
   broker:
-    url: tcp://localhost:1883
+    url: tls://2e0cec621e954a97b4917df783269b7e.s2.eu.hivemq.cloud:8883
     username:
     password:
   client:
     id: database_recorder
+
+sensor:
+  airportIATA: 
+  deviceId: 123e4567-e89b-12d3-a456-426655440000
+  sensorType: 
+  frequency: 
+
+api:
+  url: http://api.weatherstack.com/current?access_key=%s&query=%s
+  secretKey: 
 ```
 
 ### Environment variables
@@ -41,10 +51,6 @@ Instead of using a config file, you can use environment variables:
 - MQTT_BROKER_PASSWORD
 - MQTT_CLIENT_ID
 
-## Add .env
-WEATHER_URL="http://api.weatherstack.com/"
-WEATHER_API_KEY=
-
 ### Measure Example : 
     - wind_speed
     - temperature
@@ -56,10 +62,9 @@ WEATHER_API_KEY=
     - uv_index
 
 ## To start new sensor with config file
+
 cd cmd/sensor
 
-go build -o name_measure/name_exe
+go build -o name_exe
 
-cd name_measure
-
-./name_exe --config=./config_file.json
+./name_exe config_file.yaml
