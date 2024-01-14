@@ -31,7 +31,7 @@ type Sensor struct {
 }
 
 func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string, measurement string, frequency int) Sensor {
-	cfg := config.LoadConfig(&types.ConfigFile{}, "config.yaml").(*types.ConfigFile)
+	cfg := config.LoadConfig2(&types.ConfigFile{}, "config.yaml").(*types.ConfigFile)
 	return Sensor{
 		SensorID:        sensorId,
 		BrokerID:        broker.NewBroker(cfg),

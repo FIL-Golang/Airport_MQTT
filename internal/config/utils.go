@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-func LoadConfig(configType interface{}, configFileName string) interface{} {
+func LoadConfig2(configType interface{}, configFileName string) interface{} {
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 
