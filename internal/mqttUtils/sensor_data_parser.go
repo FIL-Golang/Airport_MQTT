@@ -9,7 +9,7 @@ import (
 )
 
 type payload struct {
-	Value     float64 `json:"value"`
+	Value     float32 `json:"value"`
 	Timestamp string  `json:"timestamp"`
 }
 
@@ -67,7 +67,7 @@ func GetAlertsTopic(sensor model.SensorData) string {
 func GetPayload(reading model.SensorData) []byte {
 	pay := payload{
 		Value:     reading.Value,
-		Timestamp: reading.Timestamp,
+		Timestamp: reading.Timestamp.Format("2006-01-02-15-04-05"),
 	}
 	bytePayload, _ := json.Marshal(pay)
 	return bytePayload

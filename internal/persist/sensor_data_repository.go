@@ -27,18 +27,6 @@ type SensorDataMongoMetadata struct {
 	Nature      model.Nature
 }
 
-func mapSensorData(sensorData model.SensorData) SensorDataMongo {
-	return SensorDataMongo{
-		Timestamp: primitive.NewDateTimeFromTime(sensorData.Timestamp),
-		Value:     sensorData.Value,
-		Metadata: SensorDataMongoMetadata{
-			SensorId:    sensorData.SensorId,
-			AirportIATA: sensorData.AirportIATA,
-			Nature:      sensorData.Nature,
-		},
-	}
-}
-
 type Filter struct {
 	SensorId    string
 	AirportIATA string
@@ -62,26 +50,16 @@ func NewSensorDataRepository() SensorDataRepository {
 }
 
 func (r *SensorDataMongoRepository) Store(sensor model.SensorData) error {
-	sensorData := mapSensorData(sensor)
-	err := r.store(sensorData)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *SensorDataMongoRepository) store(sensorData SensorDataMongo) error {
 	coll := r.client.Database(DATABASE).Collection(COLLECTION)
 	_, err := coll.InsertOne(context.Background(), bson.D{
-		{"timestamp", sensorData.Timestamp},
-		{"value", sensorData.Value},
+		{"timestamp", sensor.Timestamp},
+		{"value", sensor.Value},
 		{"metadata", bson.D{
-			{"sensorId", sensorData.Metadata.SensorId},
-			{"airportIATA", sensorData.Metadata.AirportIATA},
-			{"sensorType", sensorData.Metadata.Nature},
+			{"sensorId", sensor.SensorId},
+			{"airportIATA", sensor.AirportIATA},
+			{"sensorType", sensor.Nature},
 		}},
 	})
-
 	if err != nil {
 		return err
 	}

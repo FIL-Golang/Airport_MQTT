@@ -45,7 +45,7 @@ func (s Sensor) SendToBroker(data model.SensorData) {
 	topic := mqttUtils.GetTopic(data, "sensor")
 	req := s.BrokerMqtt.Publish(
 		topic, 1, false,
-		fmt.Sprintf("timestamp:%s\nvalue:%f\n", data.Timestamp, data.Value),
+		fmt.Sprintf("timestamp:%s\nvalue:%f\n", data.Timestamp.Format("2006-01-02-15-04-05"), data.Value),
 	)
 	req.Wait()
 	fmt.Printf("TypeMeasure: %s, Value: %f, Timestamp: %s\n", data.Nature, data.Value, data.Timestamp)
