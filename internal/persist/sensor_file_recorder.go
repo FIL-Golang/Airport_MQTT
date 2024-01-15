@@ -1,6 +1,7 @@
 package persist
 
 import (
+	"Airport_MQTT/internal/config"
 	"Airport_MQTT/internal/model"
 	"encoding/csv"
 	"fmt"
@@ -31,33 +32,29 @@ func (r *sensorFileRecorder) Store(data model.SensorData) (err error) {
 }
 
 func writeSensorData(data model.SensorData) error {
-	// Construire le chemin du dossier records pour l'aéroport
-	airportDir := filepath.Join("records", data.AirportIATA)
+	fileConfig := config.GetFileConfig()
+
+	airportDir := filepath.Join(fileConfig.Path, data.AirportIATA)
 	if err := os.MkdirAll(airportDir, os.ModePerm); err != nil {
 		return err
 	}
 
-	// Construire le chemin du dossier pour le type de donnée
 	dataTypeDir := filepath.Join(airportDir, data.Nature.String())
 	if err := os.MkdirAll(dataTypeDir, os.ModePerm); err != nil {
 		return err
 	}
 
-	// Construire le chemin complet du fichier CSV
-	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s.csv", data.Timestamp))
-
-	// Ouvrir le fichier CSV en mode append ou créer s'il n'existe pas encore
+	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s.csv", data.Timestamp.Format("2006-01-02")))
+	fmt.Println(fileName)
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// Créer un nouveau writer pour le fichier CSV
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	// Si le fichier est nouvellement créé, écrire l'en-tête du fichier CSV
 	fileInfo, err := file.Stat()
 	if err != nil {
 		return err
@@ -67,8 +64,7 @@ func writeSensorData(data model.SensorData) error {
 		writer.Write(header)
 	}
 
-	// Écrire les données dans le fichier CSV
-	row := []string{data.Timestamp, fmt.Sprintf("%.2f", data.Value)}
+	row := []string{data.Timestamp.String(), fmt.Sprintf("%.2f", data.Value)}
 	writer.Write(row)
 
 	return nil

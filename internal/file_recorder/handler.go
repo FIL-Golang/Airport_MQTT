@@ -1,10 +1,9 @@
-package file_recoder
+package file_recorder
 
 import (
 	"Airport_MQTT/internal/mqttUtils"
 	"Airport_MQTT/internal/persist"
 	"fmt"
-	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -20,11 +19,10 @@ func NewFileRecoderMqttHandler() *FileRecoderMqttHandler {
 	}
 }
 
-func (this *FileRecoderMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
+func (handler *FileRecoderMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("Received value : %s on topic: %s\n", msg.Payload(), msg.Topic())
 	err, data := mqttUtils.Parse(msg)
-	data.Timestamp = time.Now()
-	err := this.recorder.Store(data)
+	err = handler.recorder.Store(data)
 	if err != nil {
 		println(err.Error())
 	}

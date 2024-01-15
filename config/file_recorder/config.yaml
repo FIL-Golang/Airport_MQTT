@@ -1,0 +1,10 @@
+file:
+  path: "/records"
+
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+    username:
+    password:
+  client:
+    id: file_recorder
