@@ -8,9 +8,6 @@ import (
 func main() {
 	fmt.Println("Connecting to MQTT broker...")
 	mqttClient := mqttUtils.NewMqttClient()
-	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
-	}
 	fmt.Println("Connected to MQTT broker")
 
 	fmt.Println("Connecting to MongoDB...")
