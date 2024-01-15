@@ -49,6 +49,11 @@ func parsePayload(message mqtt.Message, data *model.SensorData) error {
 		return nil
 	}
 	data.Value = pay.Value
+	data.Timestamp, err = convertStringToTime(pay.Timestamp)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
