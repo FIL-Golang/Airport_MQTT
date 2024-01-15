@@ -10,6 +10,7 @@ type Config struct {
 	API        APIConfig        `yaml:"api"`
 	Web        WebConfig        `yaml:"web"`
 	Alerts     []Alert          `yaml:"alerts"`
+	File       File             `yaml:"file"`
 }
 
 type DatasourceConfig struct {
@@ -55,4 +56,8 @@ type Alert struct {
 	Temperature int    `yaml:"temperature"`
 	Wind        int    `yaml:"wind"`
 	Pressure    int    `yaml:"pressure"`
+}
+
+type File struct {
+	Path string `yaml:"path"`
 }

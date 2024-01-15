@@ -1,9 +1,10 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
 	"os"
 	"reflect"
+
+	"gopkg.in/yaml.v3"
 )
 
 var config Config
@@ -81,4 +82,8 @@ func GetSensorConfig() SensorConfig {
 
 func GetApiConfig() APIConfig {
 	return config.API
+}
+
+func GetFileConfig() File {
+	return config.File
 }
