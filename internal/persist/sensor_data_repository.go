@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 )
@@ -15,29 +14,11 @@ const (
 	COLLECTION = "sensor_data"
 )
 
-type SensorDataMongo struct {
-	Timestamp primitive.DateTime
-	Value     float32
-	Metadata  SensorDataMongoMetadata
-}
-
-type SensorDataMongoMetadata struct {
-	SensorId    string
-	AirportIATA string
-	Nature      model.Nature
-}
-
-type Filter struct {
-	SensorId    string
-	AirportIATA string
-	Type        model.Nature
-	From        time.Time
-	To          time.Time
-}
-
 type SensorDataRepository interface {
 	Store(sensor model.SensorData) error
-	FindAllReadingsByFilter(filter Filter) ([]model.Sensor, error)
+	FindAllSensor(filter Filter) ([]model.Sensor, error)
+	FindAllReading(filter Filter) ([]model.Sensor, error)
+	GetAvg(filter Filter) ([]model.Average, error)
 }
 
 type SensorDataMongoRepository struct {
@@ -49,90 +30,175 @@ func NewSensorDataRepository() SensorDataRepository {
 	return &SensorDataMongoRepository{client: client}
 }
 
+func toBson(sensorData model.SensorData) bson.M {
+	return bson.M{
+		"metadata": bson.M{
+			"sensorId":    sensorData.SensorId,
+			"airportIATA": sensorData.AirportIATA,
+			"sensorType":  sensorData.Nature,
+		},
+		"value":     sensorData.Value,
+		"timestamp": sensorData.Timestamp,
+	}
+}
+
 func (r *SensorDataMongoRepository) Store(sensor model.SensorData) error {
-	coll := r.client.Database(DATABASE).Collection(COLLECTION)
-	_, err := coll.InsertOne(context.Background(), bson.D{
-		{"timestamp", sensor.Timestamp},
-		{"value", sensor.Value},
-		{"metadata", bson.D{
-			{"sensorId", sensor.SensorId},
-			{"airportIATA", sensor.AirportIATA},
-			{"sensorType", sensor.Nature},
-		}},
-	})
+	coll := r.getCollection()
+	_, err := coll.InsertOne(context.Background(), toBson(sensor))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *SensorDataMongoRepository) FindAllReadingsByFilter(filter Filter) ([]model.Sensor, error) {
-	coll := r.client.Database(DATABASE).Collection(COLLECTION)
+type Filter struct {
+	SensorId    string
+	AirportIATA string
+	Type        model.Nature
+	From        time.Time
+	To          time.Time
+}
 
-	//prepare request filter
-	mongoFilter := map[string]interface{}{}
-	if filter.SensorId != "" {
-		mongoFilter["metadata.sensorId"] = filter.SensorId
-	}
-	if filter.AirportIATA != "" {
-		mongoFilter["metadata.airportIATA"] = filter.AirportIATA
-	}
-	if filter.Type != 0 {
-		mongoFilter["metadata.sensorType"] = filter.Type
-	}
-	if !filter.From.IsZero() && !filter.To.IsZero() {
-		mongoFilter["timestamp"] = map[string]interface{}{
-			"$gte": filter.From,
-			"$lte": filter.To,
-		}
+func (r *SensorDataMongoRepository) FindAllSensor(filter Filter) ([]model.Sensor, error) {
+	coll := r.getCollection()
+	request := []bson.M{
+		{"$match": buildFilter(filter)},
+		{
+			"$group": bson.M{
+				"_id": bson.M{
+					"sensorId":    "$metadata.sensorId",
+					"airportIATA": "$metadata.airportIATA",
+					"sensorType":  "$metadata.sensorType",
+				}},
+		},
+		{
+			"$project": bson.M{
+				"_id":         0,
+				"sensorId":    "$_id.sensorId",
+				"airportIATA": "$_id.airportIATA",
+				"sensorType":  "$_id.sensorType",
+			},
+		},
 	}
 
-	//execute request
-	cursor, err := coll.Find(context.Background(), mongoFilter)
+	cursor, err := coll.Aggregate(context.Background(), request)
 	if err != nil {
 		return nil, err
 	}
 
-	sensors := mapSensorDataMongo(cursor)
+	var res []model.Sensor
+	err = cursor.All(context.Background(), &res)
+	if err != nil {
+		return nil, err
+	}
 
-	return sensors, nil
+	return res, nil
 }
 
-func mapSensorDataMongo(sensorData *mongo.Cursor) []model.Sensor {
-	var sensors []model.Sensor
-	for sensorData.Next(context.Background()) {
-		var sensorDataMongo SensorDataMongo
-		err := sensorData.Decode(&sensorDataMongo)
-		if err != nil {
-			fmt.Println("Error while decoding sensor data")
-			continue
-		}
+func (r *SensorDataMongoRepository) FindAllReading(filter Filter) ([]model.Sensor, error) {
+	coll := r.getCollection()
+	request := []bson.M{
+		{"$match": buildFilter(filter)},
+		{
+			"$group": bson.M{
+				"_id": "$metadata",
+				"readings": bson.M{
+					"$push": bson.M{
+						"timestamp": "$timestamp",
+						"value":     "$value",
+					},
+				},
+			},
+		},
+		{
+			"$project": bson.M{
+				"_id":         0,
+				"sensorId":    "$_id.sensorId",
+				"airportIATA": "$_id.airportIATA",
+				"sensorType":  "$_id.sensorType",
+				"readings":    1,
+			},
+		},
+	}
 
-		sensor := model.Sensor{
-			SensorId:    sensorDataMongo.Metadata.SensorId,
-			AirportIATA: sensorDataMongo.Metadata.AirportIATA,
-			Type:        sensorDataMongo.Metadata.Nature,
-		}
+	cursor, err := coll.Aggregate(context.Background(), request)
+	if err != nil {
+		return nil, err
+	}
 
-		reading := model.Reading{
-			Timestamp: sensorDataMongo.Timestamp.Time(),
-			Value:     sensorDataMongo.Value,
-		}
+	var res []model.Sensor
+	err = cursor.All(context.Background(), &res)
 
-		//check if sensor already exists
-		exists := false
-		for i, s := range sensors {
-			if s.SensorId == sensor.SensorId {
-				sensors[i].Readings = append(sensors[i].Readings, reading)
-				exists = true
-				break
-			}
-		}
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
 
-		if !exists {
-			sensor.Readings = []model.Reading{reading}
-			sensors = append(sensors, sensor)
+func (r *SensorDataMongoRepository) GetAvg(filter Filter) ([]model.Average, error) {
+	coll := r.getCollection()
+	request := []bson.M{
+		{"$match": buildFilter(filter)},
+		{
+			"$group": bson.M{
+				"_id": "$metadata.sensorType",
+				"avg": bson.M{"$avg": "$value"},
+			},
+		},
+		{
+			"$project": bson.M{
+				"_id":        0,
+				"sensorType": "$_id",
+				"avg":        1,
+			},
+		},
+	}
+
+	cursor, err := coll.Aggregate(context.Background(), request)
+	fmt.Println(cursor)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []model.Average
+	err = cursor.All(context.Background(), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (r *SensorDataMongoRepository) getCollection() *mongo.Collection {
+	return r.client.Database(DATABASE).Collection(COLLECTION)
+}
+
+// buildFilter builds a bson.D object from a Filter object
+// It does not handle the case where the filter is empty
+func buildFilter(filter Filter) bson.M {
+	f := bson.M{}
+	if filter.SensorId != "" {
+		f["metadata.sensorId"] = filter.SensorId
+	}
+	if filter.AirportIATA != "" {
+		f["metadata.airportIATA"] = filter.AirportIATA
+	}
+	if filter.Type != model.Undefined {
+		f["metadata.sensorType"] = filter.Type
+	}
+	if (!filter.From.IsZero()) && (!filter.To.IsZero()) {
+		f["timestamp"] = bson.M{
+			"$gte": filter.From,
+			"$lte": filter.To,
+		}
+	} else if !filter.From.IsZero() {
+		f["timestamp"] = bson.M{
+			"$gte": filter.From,
+		}
+	} else if !filter.To.IsZero() {
+		f["timestamp"] = bson.M{
+			"$lte": filter.To,
 		}
 	}
-	return sensors
+	return f
 }
