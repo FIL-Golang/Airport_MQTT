@@ -17,6 +17,7 @@
     "clsx": "^2.1.0",
     "lucide-react": "^0.309.0",
     "next-themes": "^0.2.1",
+    "paho-mqtt": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.10.4",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.4",
+    "@types/paho-mqtt": "^1.0.10",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
