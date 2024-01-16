@@ -8,9 +8,16 @@ import (
 )
 
 func NewMongoClient() *mongo.Client {
-	conf := config.LoadConfig()
+	datasourceConfig := config.GetDatasourceConfig()
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(conf.Datasource.Url))
+	clientOptions := options.Client()
+	clientOptions.ApplyURI(datasourceConfig.Url)
+	//clientOptions.SetAuth(options.Credential{ //TODO : implement option to connect to with credentials
+	//	Username: datasourceConfig.Username,
+	//	Password: datasourceConfig.Password,
+	//})
+
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		panic(err)
 	}

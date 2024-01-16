@@ -6,11 +6,15 @@ import (
 )
 
 func NewMqttClient() mqtt.Client {
-	conf := config.LoadConfig()
+	MqttConfig := config.GetMqttConfig()
 	mqttClientOptions := mqtt.NewClientOptions()
-	mqttClientOptions.AddBroker(conf.Mqtt.Url)
-	mqttClientOptions.SetUsername(conf.Mqtt.Username)
-	mqttClientOptions.SetPassword(conf.Mqtt.Password)
-	mqttClientOptions.SetClientID(conf.Name)
-	return mqtt.NewClient(mqttClientOptions)
+	mqttClientOptions.AddBroker(MqttConfig.Broker.Url)
+	mqttClientOptions.SetUsername(MqttConfig.Broker.Username)
+	mqttClientOptions.SetPassword(MqttConfig.Broker.Password)
+	mqttClientOptions.SetClientID(MqttConfig.Client.Id)
+	mqttClient := mqtt.NewClient(mqttClientOptions)
+	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
+	return mqttClient
 }

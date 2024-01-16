@@ -1,0 +1,29 @@
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+    username:
+    password:
+  client:
+    id: alert_manager
+
+alerts:
+  - airport: default
+    temperature: 0
+    wind: 0
+    pressure: 0
+
+  - airport: NTE
+    temperature: 10
+    wind: 50
+    pressure: 0
+
+  - airport: CDG
+    temperature: 16
+    wind: 58
+    pressure: 0
+
+  - airport: ORY
+    temperature: 12
+    wind: 32
+    pressure: 0
+

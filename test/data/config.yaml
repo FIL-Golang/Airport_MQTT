@@ -1,0 +1,11 @@
+datasource:
+  url: http://localhost:8080/DBTest
+  username: user
+  password:
+
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+    username:
+    password:
+
