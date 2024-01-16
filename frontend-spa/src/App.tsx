@@ -12,11 +12,19 @@ import MQTTComponent from "@/components/mqtt.tsx";
 
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import { LineChart, Line, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import {Button} from "@/components/ui/button.tsx";
-import {toast} from "sonner";
+import {useState} from "react";
 
 
 function App() {
+    const [selectedAirport, setSelectedAirport] = useState("NTE");
+    const handleSelectChange = (value: string) => {
+        setSelectedAirport(value);
+    };
+
+    // TODO : CALL API, GET SENSORS LIST, GET DATA
+
+    const sensorList = ['temperature','pressure','wind_speed'];
+
     const data = [
         {
             name: 'Page A',
@@ -62,39 +70,11 @@ function App() {
         },
     ];
   return (
-      <><>
-          <MQTTComponent></MQTTComponent>
-          <Select>
-              <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Choissisez un aéroport"/>
-              </SelectTrigger>
-              <SelectContent>
-                  <SelectGroup>
-                      <SelectLabel>Aéroports</SelectLabel>
-                      <SelectItem value="NTE">Nantes</SelectItem>
-                      <SelectItem value="ORY">Paris Orly</SelectItem>
-                      <SelectItem value="CDG">Paris Charles de Gaulle</SelectItem>
-                      <SelectItem value="DBX">Dubai</SelectItem>
-                  </SelectGroup>
-              </SelectContent>
-          </Select>
-      </>
+      <><MQTTComponent airport={selectedAirport} sensorList={sensorList}/>
           <div className="w-full">
-              <Button
-                  variant="outline"
-                  onClick={() => toast("Une alerte est prête", {
-                      description: "Sunday, December 03, 2023 at 9:00 AM",
-                      action: {
-                          label: "Undo",
-                          onClick: () => console.log("Undo"),
-                      },
-                  })}
-              >
-                  Alerte simulation
-              </Button>
               <div className="flex flex-col gap-6">
                   <div>
-                      <Select defaultValue={"NTE"}>
+                      <Select onValueChange={handleSelectChange} value={selectedAirport}>
                           <SelectTrigger className="w-[220px]">
                               <SelectValue placeholder="Choissisez un aéroport"/>
                           </SelectTrigger>
