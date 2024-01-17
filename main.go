@@ -11,8 +11,9 @@ import (
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/globalDailyAverage", api.GlobalDailyAverage)
-	r.HandleFunc("/dailyAverage", api.DailyAverage).Queries("type", "{type}")
-	r.HandleFunc("/onTimeList", api.OnTimeList).Queries("type", "{type}")
+	r.HandleFunc("/dailyAverage", api.DailyAverage).Queries("from", "{from}", "to", "{to}", "type", "{type}")
+	r.HandleFunc("/onTimeList", api.OnTimeList).Queries("from", "{from}", "to", "{to}", "type", "{type}")
+	r.HandleFunc("/processJSON", api.ProcessJSONData).Methods("POST") // Nouvelle route pour traiter le JSON dans le corps
 	http.Handle("/", r)
 
 	// Démarrer le serveur sur le port 8080
