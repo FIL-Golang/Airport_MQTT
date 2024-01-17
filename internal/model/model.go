@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -34,7 +33,6 @@ func (nature Nature) MarshalJSON() ([]byte, error) {
 }
 
 func SensorNatureFromString(nature string) Nature {
-	fmt.Println("PARSING NATURE: ", nature)
 	switch nature {
 	case "temperature":
 		return Temperature

@@ -1,0 +1,7 @@
+datasource:
+  url: mongodb://localhost:27017
+  username:
+  password:
+
+web:
+  port: 8081

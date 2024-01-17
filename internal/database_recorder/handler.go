@@ -1,10 +1,10 @@
 package database_recorder
 
 import (
-	"Airport_MQTT/internal/mqttUtils"
 	"Airport_MQTT/internal/persist"
-	"fmt"
+	"Airport_MQTT/internal/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"log/slog"
 )
 
 type DatabaseRecorderMqttHandler struct {
@@ -19,14 +19,17 @@ func NewDatabaseRecorderMqttHandler() *DatabaseRecorderMqttHandler {
 }
 
 func (handler *DatabaseRecorderMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
-	fmt.Printf("Received value : %s on topic: %s\n", msg.Payload(), msg.Topic())
-	err, data := mqttUtils.Parse(msg)
+	slog.Debug("Received message: " + string(msg.Payload()) + " on topic: " + msg.Topic())
+	err, data := utils.Parse(msg)
 	if err != nil {
-		println(err.Error())
+		slog.Error("Error while parsing mqtt message: " + err.Error())
 		return
 	}
+
+	slog.Info("Received data from sensor: " + data.SensorId + " from airport: " + data.AirportIATA + " of type: " + data.Nature.String())
 	err = handler.repository.Store(data)
 	if err != nil {
-		println(err.Error())
+		slog.Error("Error while storing data: " + err.Error())
+		return
 	}
 }

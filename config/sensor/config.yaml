@@ -1,6 +1,6 @@
 mqtt:
   broker:
-    url: tls://2e0cec621e954a97b4917df783269b7e.s2.eu.hivemq.cloud:8883
+    url: tcp://localhost:1883
     username:
     password:
 

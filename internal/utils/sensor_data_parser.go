@@ -1,4 +1,4 @@
-package mqttUtils
+package utils
 
 import (
 	"Airport_MQTT/internal/model"
@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 )
+
+// These methods are used to format and parse the data sent by the sensors over MQTT
 
 type payload struct {
 	Value     float32 `json:"value"`

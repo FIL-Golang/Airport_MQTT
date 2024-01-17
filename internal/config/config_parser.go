@@ -1,22 +1,58 @@
 package config
 
 import (
+	"gopkg.in/yaml.v3"
+	"log/slog"
 	"os"
 	"reflect"
-
-	"gopkg.in/yaml.v3"
+	"strings"
 )
 
 var config Config
 
+func GetExeName() string {
+	exePath := os.Args[0]
+	exePathArray := strings.Split(exePath, string(os.PathSeparator))
+	exeName := exePathArray[len(exePathArray)-1]
+	return exeName
+}
+
+func LoadConfigFromArgs() {
+	slog.Info("Loading config ...")
+	configPath := getConfigPath()
+	LoadConfig(configPath)
+}
+
+func getConfigPath() string {
+	args := os.Args
+
+	configPath := ""
+
+	if len(args) > 1 {
+		configPath = args[1]
+	}
+
+	if configPath == "" {
+		slog.Warn("No config file specified, looking for config.yaml in current directory")
+		configPath = "config.yaml"
+
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
+			slog.Warn("No config file found")
+			return ""
+		}
+	}
+	return configPath
+}
+
 func LoadConfig(path string) {
 	config = Config{}
-
-	err := LoadValuesFromYaml(&config, path)
-	if err != nil {
-		panic(err)
+	if path != "" {
+		err := LoadValuesFromYaml(&config, path)
+		if err != nil {
+			panic(err)
+		}
 	}
-	err = LoadValuesFromEnv(&config)
+	err := LoadValuesFromEnv(&config)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +108,7 @@ func GetMqttConfig() MqttConfig {
 	return config.Mqtt
 }
 
-func GetAlerts() []Alert { //TODO : same
+func GetAlerts() []Alert {
 	return config.Alerts
 }
 
@@ -86,4 +122,8 @@ func GetApiConfig() APIConfig {
 
 func GetFileConfig() File {
 	return config.File
+}
+
+func GetWebConfig() WebConfig {
+	return config.Web
 }

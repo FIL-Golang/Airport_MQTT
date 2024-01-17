@@ -1,3 +1,3 @@
-package mqttUtils
+package utils
 
 //TODO : add tests

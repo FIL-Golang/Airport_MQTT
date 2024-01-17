@@ -6,7 +6,7 @@
 
 Store every data received send by sensors on the mqtt broker in a mongo database.
 
-### Run 
+### Run
 
 ```bash
 ./database_recorder <path_to_yaml_config_file>
@@ -43,6 +43,7 @@ api:
 ### Environment variables
 
 Instead of using a config file, you can use environment variables:
+
 - DATASOURCE_URL
 - DATASOURCE_USERNAME
 - DATASOURCE_PASSWORD
@@ -51,7 +52,8 @@ Instead of using a config file, you can use environment variables:
 - MQTT_BROKER_PASSWORD
 - MQTT_CLIENT_ID
 
-### Measure Example : 
+### Measure Example :
+
     - wind_speed
     - temperature
     - pressure

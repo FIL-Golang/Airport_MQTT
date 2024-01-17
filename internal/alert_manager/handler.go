@@ -3,7 +3,7 @@ package alert_manager
 import (
 	"Airport_MQTT/internal/config"
 	"Airport_MQTT/internal/model"
-	"Airport_MQTT/internal/mqttUtils"
+	"Airport_MQTT/internal/utils"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -19,7 +19,7 @@ func NewAlertManagerMqttHandler() *AlertManagerMqttHandler {
 }
 
 func (this *AlertManagerMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
-	err, data := mqttUtils.Parse(msg)
+	err, data := utils.Parse(msg)
 	if err != nil {
 		println(err.Error())
 		return
@@ -50,5 +50,5 @@ func (this *AlertManagerMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Me
 }
 
 func (h *AlertManagerMqttHandler) publishAlert(client mqtt.Client, data model.SensorData, message string) {
-	client.Publish(mqttUtils.GetAlertsTopic(data), 0, false, message)
+	client.Publish(utils.GetAlertsTopic(data), 0, false, message)
 }

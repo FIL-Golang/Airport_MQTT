@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -26,7 +27,7 @@ func (s *Sensor) fetchWeatherData(city string) (WeatherResponse, error) {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-
+			slog.Error("Error closing response body")
 		}
 	}(resp.Body)
 

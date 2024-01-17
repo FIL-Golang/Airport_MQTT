@@ -2,7 +2,7 @@ package sensor
 
 import (
 	"Airport_MQTT/internal/model"
-	"Airport_MQTT/internal/mqttUtils"
+	"Airport_MQTT/internal/utils"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/krisukox/google-flights-api/iata"
@@ -33,7 +33,7 @@ type Sensor struct {
 func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string, measurement string, frequency int) Sensor {
 	return Sensor{
 		DeviceId:        sensorId,
-		BrokerMqtt:      mqttUtils.NewMqttClient(),
+		BrokerMqtt:      utils.NewMqttClient(),
 		AirportIATA:     iataCode,
 		Type:            measurement,
 		Frequency:       frequency,
@@ -42,7 +42,7 @@ func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string
 }
 
 func (s Sensor) SendToBroker(data model.SensorData) {
-	topic := mqttUtils.GetTopic(data, "sensor")
+	topic := utils.GetTopic(data, "sensor")
 	req := s.BrokerMqtt.Publish(
 		topic, 1, false,
 		fmt.Sprintf("timestamp:%s\nvalue:%f\n", data.Timestamp.Format("2006-01-02-15-04-05"), data.Value),
