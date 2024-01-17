@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/json"
+	"Airport_MQTT/internal/persist"
 	"fmt"
 	"net/http"
 	"time"
@@ -42,28 +42,4 @@ func OnTimeList(w http.ResponseWriter, r *http.Request) {
 	typeParam := r.URL.Query().Get("type")
 	//persist.NewSensorDataRepository().FindAllReading()
 	fmt.Fprint(w, typeParam)
-}
-
-type JsonRequest struct {
-	Type string `json:"type"`
-	// Ajoutez d'autres champs selon votre besoin
-}
-
-func ProcessJSONData(w http.ResponseWriter, r *http.Request) {
-	// Vérifier que la méthode est POST
-	if r.Method != http.MethodPost {
-		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-		return
 	}
-
-	// Décodez le JSON brut du corps de la requête
-	var requestData JsonRequest
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&requestData); err != nil {
-		http.Error(w, "Erreur de décodage JSON", http.StatusBadRequest)
-		return
-	}
-
-	// Vous pouvez maintenant utiliser les données décodées (requestData)
-	fmt.Fprintf(w, "Données JSON reçues: %+v", requestData)
-}
