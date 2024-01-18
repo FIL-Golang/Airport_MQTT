@@ -5,81 +5,144 @@ import (
 	"Airport_MQTT/internal/persist"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"time"
 )
 
-//Example of sending data
-
-func SendDataExample(w http.ResponseWriter, r *http.Request) {
-	sensorData := model.SensorData{
-		SensorId:    "1",
-		AirportIATA: "DBX",
-		Nature:      model.Temperature, Value: rand.Float32(),
-		Timestamp: time.Now().AddDate(0, 0, -1)}
-
-	err := persist.NewSensorDataRepository().Store(sensorData)
-	if err != nil {
-		fmt.Println(w, "Error sending data: %v", err)
-		return
-	}
+func parseDate(dateStr string) (time.Time, error) {
+	formatDate := "02-01-2006"
+	return time.Parse(formatDate, dateStr)
 }
 
-//Example of sending data
+type SensorDataResponse struct {
+	Jour string          `json:"jour"`
+	Avg  []model.Average `json:"avg"`
+}
 
-func GetSensor(w http.ResponseWriter, r *http.Request) {
-	sensorID := r.URL.Query().Get("sensorID")
-	airportIATA := r.URL.Query().Get("airportIATA")
-	_type := r.URL.Query().Get("type")
+type GlobalSensorDataResponse struct {
+	Jour        string          `json:"jour"`
+	AvgTemp     []model.Average `json:"avgTemperature"`
+	AvgPressure []model.Average `json:"avgPressure"`
+	AvgWind     []model.Average `json:"avgWind"`
+}
 
-	filter := persist.Filter{
-		From: time.Unix(0, 0),
-		To:   time.Now(),
-	}
+type ListDataResponse struct {
+	Jour string         `json:"jour"`
+	Avg  []model.Sensor `json:"avg"`
+}
 
-	if sensorID != "" {
-		filter.SensorId = sensorID
-	}
-	if airportIATA != "" {
-		filter.AirportIATA = airportIATA
-	}
-	if _type != "" {
-		filter.Type = model.SensorNatureFromString(_type)
-	}
+func GlobalDailyAverage(w http.ResponseWriter, r *http.Request) {
+	paramDay := r.URL.Query().Get("day")
 
-	data, err := persist.NewSensorDataRepository().FindAllSensor(filter)
+	// Convertion de la chaîne de caractères de la date en objet time.Time
+	date, err := parseDate(paramDay)
 	if err != nil {
-		fmt.Println(w, "Error retrieving data: %v", err)
+		fmt.Println("Erreur lors de la conversion de la date :", err)
 		return
+	}
+
+	// Creation des objets time.Time pour le début et la fin de la journee
+	debut := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
+
+	temperature := model.SensorNatureFromString("temperature")
+	filterTemp := persist.Filter{
+		Type: temperature,
+		From: debut,
+		To:   fin,
+	}
+	avgTemp, err := persist.NewSensorDataRepository().GetAvg(filterTemp)
+
+	pressure := model.SensorNatureFromString("pressure")
+	filterPress := persist.Filter{
+		Type: pressure,
+		From: debut,
+		To:   fin,
+	}
+	avgPress, err := persist.NewSensorDataRepository().GetAvg(filterPress)
+
+	windSpeed := model.SensorNatureFromString("wind_speed")
+	filterWind := persist.Filter{
+		Type: windSpeed,
+		From: debut,
+		To:   fin,
+	}
+	avgWind, err := persist.NewSensorDataRepository().GetAvg(filterWind)
+
+	response := GlobalSensorDataResponse{
+		Jour:        debut.Format("02/01/2006"),
+		AvgTemp:     avgTemp,
+		AvgPressure: avgPress,
+		AvgWind:     avgWind,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-
-	// TODO : MANAGE FUNCTION RETURN VALUE AND ERROR
+	json.NewEncoder(w).Encode(response)
 }
 
-//Example of getting data
+func DailyAverage(w http.ResponseWriter, r *http.Request) {
+	typeParam := r.URL.Query().Get("type")
+	paramDay := r.URL.Query().Get("day")
 
-func GetReadings(w http.ResponseWriter, r *http.Request) {
-	sensorID := r.URL.Query().Get("sensorID")
-	airportIATA := r.URL.Query().Get("airportIATA")
-	_type := r.URL.Query().Get("type")
+	// Convertion de la chaîne de caractères de la date en objet time.Time
+	date, err := parseDate(paramDay)
+	if err != nil {
+		fmt.Println("Erreur lors de la conversion de la date :", err)
+		return
+	}
+
+	// Creation des objets time.Time pour le début et la fin de la journee
+	debut := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
+
+	//Creation du type
+	reelType := model.SensorNatureFromString(typeParam)
+	if reelType == model.Undefined {
+		fmt.Println("Erreur lors de la conversion du type :", err)
+		return
+	}
 
 	filter := persist.Filter{
-		From: time.Unix(0, 0),
-		To:   time.Now(),
+		Type: reelType,
+		From: debut,
+		To:   fin,
 	}
 
-	if sensorID != "" {
-		filter.SensorId = sensorID
+	avg, err := persist.NewSensorDataRepository().GetAvg(filter)
+
+	response := SensorDataResponse{
+		Jour: debut.Format("02/01/2006"),
+		Avg:  avg,
 	}
-	if airportIATA != "" {
-		filter.AirportIATA = airportIATA
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func OnTimeList(w http.ResponseWriter, r *http.Request) {
+	typeParam := r.URL.Query().Get("type")
+	paramDay := r.URL.Query().Get("day")
+
+	// Convertion de la chaîne de caractères de la date en objet time.Time
+	date, err := parseDate(paramDay)
+	if err != nil {
+		fmt.Println("Erreur lors de la conversion de la date :", err)
+		return
 	}
-	if _type != "" {
-		filter.Type = model.SensorNatureFromString(_type)
+
+	// Creation des objets time.Time pour le début et la fin de la journee
+	debut := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
+
+	reelType := model.SensorNatureFromString(typeParam)
+	if reelType == model.Undefined {
+		fmt.Println("Erreur lors de la conversion du type :", err)
+		return
+	}
+	filter := persist.Filter{
+		Type: reelType,
+		From: debut,
+		To:   fin,
 	}
 
 	data, err := persist.NewSensorDataRepository().FindAllReading(filter)
@@ -88,20 +151,11 @@ func GetReadings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := ListDataResponse{
+		Jour: debut.Format("02/01/2006"),
+		Avg:  data,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-
-	// TODO : MANAGE FUNCTION RETURN VALUE AND ERROR
-}
-
-func GlobalDailyAverage(w http.ResponseWriter, r *http.Request) {
-	// TODO : implement
-}
-
-func DailyAverage(w http.ResponseWriter, r *http.Request) {
-	// TODO : implement
-}
-
-func OnTimeList(w http.ResponseWriter, r *http.Request) {
-	// TODO : implement
+	json.NewEncoder(w).Encode(response)
 }

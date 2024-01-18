@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Airport_MQTT/cmd/api"
+	"Airport_MQTT/internal/api"
 	"fmt"
 	"net/http"
 
@@ -10,17 +10,12 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/globalDailyAverage", api.GlobalDailyAverage)
-	r.HandleFunc("/dailyAverage", api.DailyAverage).Queries("from", "{from}", "to", "{to}", "type", "{type}")
-	r.HandleFunc("/onTimeList", api.OnTimeList).Queries("from", "{from}", "to", "{to}", "type", "{type}")
-
-	r.HandleFunc("/sendData", api.SendDataExample)
-	r.HandleFunc("/getSensor", api.GetSensor).
-		Queries("sensorID", "{sensorID}", "airportIATA", "{airportIATA}", "type", "{type}")
-	r.HandleFunc("/getReadings", api.GetReadings).
-		Queries("sensorID", "{sensorID}", "airportIATA", "{airportIATA}", "type", "{type}")
-	r.HandleFunc("/globalDailyAverage", api.GlobalDailyAverage)
-	r.HandleFunc("/onTimeList", api.OnTimeList).Queries("type", "{type}")
+	r.HandleFunc("/globalDailyAverage", api.GlobalDailyAverage).
+		Queries("day", "{day}")
+	r.HandleFunc("/dailyAverage", api.DailyAverage).
+		Queries("day", "{day}", "type", "{type}")
+	r.HandleFunc("/onTimeList", api.OnTimeList).
+		Queries("day", "{day}", "type", "{type}")
 
 	http.Handle("/", r)
 
