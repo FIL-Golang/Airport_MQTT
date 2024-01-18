@@ -10,10 +10,8 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/globalDailyAverage", api.GlobalDailyAverage).
-		Queries("day", "{day}")
 	r.HandleFunc("/dailyAverage", api.DailyAverage).
-		Queries("day", "{day}", "type", "{type}")
+		Queries("day", "{day}")
 	r.HandleFunc("/onTimeList", api.OnTimeList).
 		Queries("day", "{day}", "type", "{type}")
 
