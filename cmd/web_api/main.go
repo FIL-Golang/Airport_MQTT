@@ -3,17 +3,21 @@ package main
 import (
 	"Airport_MQTT/internal/api"
 	"fmt"
-	"net/http"
-
 	"github.com/gorilla/mux"
+	"github.com/swaggo/http-swagger"
+	"net/http"
 )
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/dailyAverage", api.DailyAverage).
+	controller := api.NewRestController()
+	r.HandleFunc("/dailyAverage", controller.DailyAverage).
 		Queries("day", "{day}")
-	r.HandleFunc("/onTimeList", api.OnTimeList).
-		Queries("day", "{day}", "type", "{type}")
+	r.HandleFunc("/onTimeList", controller.OnTimeList).
+		Queries("from", "{from}", "to", "{to}", "type", "{type}")
+
+	//Swagger
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	http.Handle("/", r)
 

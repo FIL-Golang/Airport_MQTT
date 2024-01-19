@@ -19,111 +19,43 @@ type SensorDataResponse struct {
 	Avg  []model.Average `json:"avg"`
 }
 
-type GlobalSensorDataResponse struct {
-	Jour        string          `json:"jour"`
-	AvgTemp     []model.Average `json:"avgTemperature"`
-	AvgPressure []model.Average `json:"avgPressure"`
-	AvgWind     []model.Average `json:"avgWind"`
+type ErrorResponse struct {
+	Error string `json:"error"`
 }
 
-type ListDataResponse struct {
-	Jour string         `json:"jour"`
-	Avg  []model.Sensor `json:"avg"`
+type RestController struct {
+	repository persist.SensorDataRepository
 }
 
-func DailyAverage(w http.ResponseWriter, r *http.Request) {
+func NewRestController() *RestController {
+	repository := persist.NewSensorDataRepository()
+	return &RestController{
+		repository: repository,
+	}
+}
+
+// DailyAverage godoc
+// @Summary Get daily averages
+// @Description Get daily averages for temperature, pressure, and wind speed or everything.
+// @ID get-daily-averages
+// @Accept json
+// @Produce json
+// @Param day query string true "Date in the format '02-01-2006'"
+// @Param type query string false "Type of sensor data (temperature, pressure, wind_speed)"
+// @Success 200 {object} GlobalSensorDataResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /dailyAverage [get]
+func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Request) {
 	typeParam := r.URL.Query().Get("type")
 	paramDay := r.URL.Query().Get("day")
+	airportIATA := r.URL.Query().Get("airportIATA")
 
 	// Convertion de la chaîne de caractères de la date en objet time.Time
 	date, err := parseDate(paramDay)
 	if err != nil {
-		fmt.Println("Erreur lors de la conversion de la date :", err)
-		return
-	}
-
-	// Creation des objets time.Time pour le début et la fin de la journee
-	debut := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
-	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
-
-	repo := persist.NewSensorDataRepository()
-
-	if typeParam == "" {
-		temperature := model.SensorNatureFromString("temperature")
-		filterTemp := persist.Filter{
-			Type: temperature,
-			From: debut,
-			To:   fin,
-		}
-		avgTemp, err := repo.GetAvg(filterTemp)
-		if err != nil {
-			fmt.Println("Erreur lors de la récupération de la moyenne de rempérature :", err)
-			return
-		}
-
-		pressure := model.SensorNatureFromString("pressure")
-		filterPress := persist.Filter{
-			Type: pressure,
-			From: debut,
-			To:   fin,
-		}
-		avgPress, err := repo.GetAvg(filterPress)
-
-		windSpeed := model.SensorNatureFromString("wind_speed")
-		filterWind := persist.Filter{
-			Type: windSpeed,
-			From: debut,
-			To:   fin,
-		}
-		avgWind, err := repo.GetAvg(filterWind)
-
-		response := GlobalSensorDataResponse{
-			Jour:        debut.Format("02/01/2006"),
-			AvgTemp:     avgTemp,
-			AvgPressure: avgPress,
-			AvgWind:     avgWind,
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	} else {
-		//Creation du type
-		reelType := model.SensorNatureFromString(typeParam)
-		if reelType == model.Undefined {
-			fmt.Println("Erreur lors de la conversion du type :", err)
-			return
-		}
-
-		filter := persist.Filter{
-			Type: reelType,
-			From: debut,
-			To:   fin,
-		}
-
-		avg, err := repo.GetAvg(filter)
-		if err != nil {
-			fmt.Println("Erreur lors de la récupération de la moyenne :", err)
-			return
-		}
-
-		response := SensorDataResponse{
-			Jour: debut.Format("02/01/2006"),
-			Avg:  avg,
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	}
-}
-
-func OnTimeList(w http.ResponseWriter, r *http.Request) {
-	typeParam := r.URL.Query().Get("type")
-	paramDay := r.URL.Query().Get("day")
-
-	// Convertion de la chaîne de caractères de la date en objet time.Time
-	date, err := parseDate(paramDay)
-	if err != nil {
-		fmt.Println("Erreur lors de la conversion de la date :", err)
+		w.WriteHeader(http.StatusBadRequest)
+		errorResponse := ErrorResponse{Error: "Problème de conversion de la date"}
+		json.NewEncoder(w).Encode(errorResponse)
 		return
 	}
 
@@ -132,8 +64,70 @@ func OnTimeList(w http.ResponseWriter, r *http.Request) {
 	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
 
 	reelType := model.SensorNatureFromString(typeParam)
+
+	filter := persist.Filter{
+		AirportIATA: airportIATA,
+		Type:        reelType,
+		From:        debut,
+		To:          fin,
+	}
+
+	avg, err := controller.repository.GetAvg(filter)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		errorResponse := ErrorResponse{Error: "Problème lors de la récupération de la moyenne"}
+		json.NewEncoder(w).Encode(errorResponse)
+		return
+	}
+
+	response := SensorDataResponse{
+		Jour: debut.Format("02/01/2006"),
+		Avg:  avg,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// OnTimeList godoc
+// @Summary Get daily averages
+// @Description Get every measures by a type.
+// @ID on-time-list
+// @Accept json
+// @Produce json
+// @Param day query string true "Date in the format '02-01-2006'"
+// @Param type query string true "Type of sensor data (temperature, pressure, wind_speed)"
+// @Success 200 {object} GlobalSensorDataResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /onTimeList [get]
+func (controller *RestController) OnTimeList(w http.ResponseWriter, r *http.Request) {
+	typeParam := r.URL.Query().Get("type")
+	paramFrom := r.URL.Query().Get("from")
+	paramTo := r.URL.Query().Get("to")
+
+	// Convertion de la chaîne de caractères de la date en objet time.Time
+	debut, err := parseDate(paramFrom)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		errorResponse := ErrorResponse{Error: "Problème lors de la conversion de la date"}
+		json.NewEncoder(w).Encode(errorResponse)
+		return
+	}
+
+	fin, err := parseDate(paramTo)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		errorResponse := ErrorResponse{Error: "Problème lors de la conversion de la date"}
+		json.NewEncoder(w).Encode(errorResponse)
+		return
+	}
+
+	reelType := model.SensorNatureFromString(typeParam)
 	if reelType == model.Undefined {
-		fmt.Println("Erreur lors de la conversion du type :", err)
+		w.WriteHeader(http.StatusBadRequest)
+		errorResponse := ErrorResponse{Error: "Problème lors de la conversion du type"}
+		json.NewEncoder(w).Encode(errorResponse)
 		return
 	}
 	filter := persist.Filter{
@@ -142,17 +136,14 @@ func OnTimeList(w http.ResponseWriter, r *http.Request) {
 		To:   fin,
 	}
 
-	data, err := persist.NewSensorDataRepository().FindAllReading(filter)
+	data, err := controller.repository.FindAllReading(filter)
 	if err != nil {
-		fmt.Println(w, "Error retrieving data: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		errorResponse := ErrorResponse{Error: "Problème lors de la récupération des mesures"}
+		json.NewEncoder(w).Encode(errorResponse)
 		return
 	}
 
-	response := ListDataResponse{
-		Jour: debut.Format("02/01/2006"),
-		Avg:  data,
-	}
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(data)
 }
