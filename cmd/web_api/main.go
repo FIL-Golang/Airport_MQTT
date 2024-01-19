@@ -15,6 +15,11 @@ func main() {
 		Queries("day", "{day}")
 	r.HandleFunc("/onTimeList", controller.OnTimeList).
 		Queries("from", "{from}", "to", "{to}", "type", "{type}")
+	r.HandleFunc("/distinctAirportCodes", controller.GetDistinctAirportCodes)
+	r.HandleFunc("/sensorsForAirport", controller.GetAllSensorsForAirport).
+		Queries("airportIATA", "{airportIATA}")
+	r.HandleFunc("/readingsForSensor", controller.GetAllReadingsForSensor).
+		Queries("sensorId", "{sensorId}", "airportIATA", "{airportIATA}")
 
 	//Swagger
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)

@@ -34,6 +34,81 @@ func NewRestController() *RestController {
 	}
 }
 
+// GetDistinctAirportCodes godoc
+// @Summary Get distinct airport codes
+// @Description Retrieve a list of all distinct airport IATA codes from the database.
+// @ID get-distinct-airport-codes
+// @Accept json
+// @Produce json
+// @Success 200 {array} string
+// @Failure 500 {object} ErrorResponse
+// @Router /distinctAirportCodes [get]
+func (controller *RestController) GetDistinctAirportCodes(w http.ResponseWriter, r *http.Request) {
+	codes, err := controller.repository.GetDistinctAirportCodes()
+	if err != nil {
+		// Handle error
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: fmt.Sprintf("Error fetching airport codes: %v", err)})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(codes)
+}
+
+// GetAllSensorsForAirport godoc
+// @Summary Get all sensors for a specific airport
+// @Description Retrieve all sensors associated with a given airport IATA code.
+// @ID get-all-sensors-for-airport
+// @Accept json
+// @Produce json
+// @Param airportIATA query string true "Airport IATA Code"
+// @Success 200 {array} model.Sensor
+// @Failure 500 {object} ErrorResponse
+// @Router /sensorsForAirport [get]
+func (controller *RestController) GetAllSensorsForAirport(w http.ResponseWriter, r *http.Request) {
+	airportIATA := r.URL.Query().Get("airportIATA")
+
+	filter := persist.Filter{AirportIATA: airportIATA}
+	sensors, err := controller.repository.FindAllSensor(filter)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to fetch sensors: " + err.Error()})
+		return
+	}
+
+	json.NewEncoder(w).Encode(sensors)
+}
+
+// GetAllReadingsForSensor godoc
+// @Summary Get all readings for a specific sensor
+// @Description Retrieve all readings from a specific sensor, optionally filtered by airport IATA code.
+// @ID get-all-readings-for-sensor
+// @Accept json
+// @Produce json
+// @Param sensorId query string true "Sensor ID"
+// @Param airportIATA query string false "Airport IATA Code"
+// @Success 200 {array} model.Sensor
+// @Failure 500 {object} ErrorResponse
+// @Router /readingsForSensor [get]
+func (controller *RestController) GetAllReadingsForSensor(w http.ResponseWriter, r *http.Request) {
+	sensorId := r.URL.Query().Get("sensorId")
+	airportIATA := r.URL.Query().Get("airportIATA")
+
+	filter := persist.Filter{
+		SensorId:    sensorId,
+		AirportIATA: airportIATA,
+	}
+	readings, err := controller.repository.FindAllReading(filter)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to fetch readings: " + err.Error()})
+		return
+	}
+
+	json.NewEncoder(w).Encode(readings)
+}
+
 // DailyAverage godoc
 // @Summary Get daily averages
 // @Description Get daily averages for temperature, pressure, and wind speed or everything.
