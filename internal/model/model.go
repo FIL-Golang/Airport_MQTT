@@ -1,11 +1,15 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Nature int
 
 const (
-	Temperature Nature = iota
+	Undefined Nature = iota
+	Temperature
 	WindSpeed
 	Pressure
 )
@@ -19,24 +23,18 @@ type SensorData struct {
 	Timestamp   time.Time
 }
 
-// Sensor is the data that we return from the API
-type Sensor struct {
-	SensorId    string
-	AirportIATA string
-	Type        Nature
-	Readings    []Reading
-}
-
-type Reading struct {
-	Timestamp time.Time
-	Value     float32
-}
-
 func (nature Nature) String() string {
-	return [...]string{"temperature", "wind_speed", "pressure"}[nature]
+	return [...]string{"undefined", "temperature", "wind_speed", "pressure"}[nature]
+}
+
+// MarshalJSON marshals the enum as a quoted json string
+// Permit to send the string instead of the int when using json.Marshal
+func (nature Nature) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + nature.String() + `"`), nil
 }
 
 func SensorNatureFromString(nature string) Nature {
+	fmt.Println("PARSING NATURE: ", nature)
 	switch nature {
 	case "temperature":
 		return Temperature
@@ -44,7 +42,26 @@ func SensorNatureFromString(nature string) Nature {
 		return Pressure
 	case "wind_speed":
 		return WindSpeed
-	default:
-		return -1
+	default: // undefined
+		return Undefined
 	}
+}
+
+//Types for fetching data from the database
+
+type Sensor struct {
+	SensorId    string    `bson:"sensorId" json:"sensorId"`
+	AirportIATA string    `bson:"airportIATA" json:"airportIATA"`
+	Type        Nature    `bson:"sensorType" json:"sensorType"`
+	Readings    []Reading `bson:"readings" json:"readings,omitempty"`
+}
+
+type Reading struct {
+	Timestamp time.Time `bson:"timestamp" json:"timestamp"`
+	Value     float32   `bson:"value" json:"value"`
+}
+
+type Average struct {
+	Avg        float64 `bson:"avg"`
+	SensorType Nature  `bson:"sensorType"`
 }
