@@ -1,8 +1,8 @@
 mqtt:
   broker:
     url: tls://2e0cec621e954a97b4917df783269b7e.s2.eu.hivemq.cloud:8883
-    username: Mqtt_golang0
-    password: Mqtt_golang0
+    username:
+    password:
 
 sensor:
   airportIATA: DXB
@@ -12,4 +12,4 @@ sensor:
 
 api:
   url: http://api.weatherstack.com/current?access_key=%s&query=%s
-  secretKey: f8d30dd9263eac9176994348c4420b62
+  secretKey:

@@ -1,5 +1,5 @@
 file:
-  path: "/Users/titoucoch/Desktop/IMT/S1/ArchiD/Airport_MQTT/records"
+  path:
 
 mqtt:
   broker:

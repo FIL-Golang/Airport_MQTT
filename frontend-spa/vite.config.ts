@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'process.env.REACT_APP_MQTT_URL': JSON.stringify(env.REACT_APP_MQTT_URL),
+      'process.env.REACT_APP_API_URL': JSON.stringify(env.REACT_APP_API_URL),
       'process.env.REACT_APP_MQTT_PASSWORD': JSON.stringify(env.REACT_APP_MQTT_PASSWORD),
       'process.env.REACT_APP_MQTT_USERNAME': JSON.stringify(env.REACT_APP_MQTT_USERNAME),
     },
