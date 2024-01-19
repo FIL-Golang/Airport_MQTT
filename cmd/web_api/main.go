@@ -11,14 +11,22 @@ import (
 func main() {
 	r := mux.NewRouter()
 	controller := api.NewRestController()
+
 	r.HandleFunc("/dailyAverage", controller.DailyAverage).
 		Queries("day", "{day}")
+
 	r.HandleFunc("/onTimeList", controller.OnTimeList).
 		Queries("from", "{from}", "to", "{to}", "type", "{type}")
+
 	r.HandleFunc("/distinctAirportCodes", controller.GetDistinctAirportCodes)
+
 	r.HandleFunc("/sensorsForAirport", controller.GetAllSensorsForAirport).
 		Queries("airportIATA", "{airportIATA}")
+
 	r.HandleFunc("/readingsForSensor", controller.GetAllReadingsForSensor).
+		Queries("sensorId", "{sensorId}", "airportIATA", "{airportIATA}")
+
+	r.HandleFunc("/lastReadingForSensor", controller.GetLastReadingForSensor).
 		Queries("sensorId", "{sensorId}", "airportIATA", "{airportIATA}")
 
 	//Swagger

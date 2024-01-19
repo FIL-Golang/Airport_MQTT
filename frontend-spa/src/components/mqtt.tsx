@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import mqtt, { MqttClient, IClientOptions } from 'mqtt';
 import {toast} from "sonner";
+import {Sensor} from "../../utils/types.tsx";
+import {generateUniqueKey} from "../../utils/utils.tsx";
 
 interface MqttComponentProps {
     airport: string;
-    sensorList: string[];
+    sensorList: Sensor[];
 }
 
 function MqttComponent(props: MqttComponentProps) {
@@ -14,7 +16,7 @@ function MqttComponent(props: MqttComponentProps) {
 
     if(url && username && password) {
         useEffect(() => {
-            const clientId = 'mqtt-client-' + Math.random().toString(16);
+            const clientId = generateUniqueKey('mqtt-client-');
 
             const options: IClientOptions = {
                 keepalive: 60,
@@ -32,7 +34,7 @@ function MqttComponent(props: MqttComponentProps) {
             client.on('connect', () => {
                 console.log('MQTT client connected');
                 for (let sensor of props.sensorList) {
-                    client.subscribe("airport/" + props.airport + "/sensor/" +sensor + '/#');
+                    client.subscribe("airport/" + props.airport + "/sensor/" +sensor.sensorType + '/#');
                 }
             });
 
@@ -40,8 +42,8 @@ function MqttComponent(props: MqttComponentProps) {
                 toast("Nouvelle alerte ", {
                     description: 'Message : ' + message.toString(),
                     action: {
-                        label: "Ok",
-                        onClick: () => console.log("Ok"),
+                        label: "Fermer",
+                        onClick: () => console.log("Alerte fermée")
                     },
                 })
             });
