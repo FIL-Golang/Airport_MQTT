@@ -1,7 +1,105 @@
 {
     "swagger": "2.0",
     "info": {
+        "title": "AirportMQTT API",
+        "description": "Display of readings et average specifying type and/or date.",
+        "version": "1.0.0",
         "contact": {}
     },
-    "paths": {}
+    "paths": {
+        "/dailyAverage": {
+            "get": {
+                "tags": [
+                    "dailyAverage"
+                ],
+                "summary": "Get daily average",
+                "description": "Get daily average of every type of sensor, you can optionally specify one",
+                "operationId": "getDailyAverage",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "day",
+                        "in": "query",
+                        "description": "date",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "type of sensor",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "airportIATA",
+                        "in": "query",
+                        "description": "ID of the airport",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/onTimeList": {
+            "get": {
+                "tags": [
+                    "onTimeList"
+                ],
+                "summary": "Get on time list",
+                "description": "Get list of readings between two dates given, type can be optionally added",
+                "operationId": "getOnTimeList",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "type of sensor",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "beginning of the readings",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "end of the readings",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        }
+    }
 }

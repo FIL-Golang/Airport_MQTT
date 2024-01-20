@@ -91,7 +91,7 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 }
 
 // OnTimeList godoc
-// @Summary Get daily averages
+// @Summary Get readings by type
 // @Description Get every measures by a type.
 // @ID on-time-list
 // @Accept json
