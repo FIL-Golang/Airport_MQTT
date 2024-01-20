@@ -12,8 +12,8 @@ build: clean
 	go build -o bin/ ./cmd/...
 	@echo "Build completed."
 
-build-images: build
+build-images:
 	@echo "Building docker image..."
-	script/build-image.sh
+	scripts/build-images.sh
 
 	@echo "Build docker image completed."
