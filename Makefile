@@ -12,7 +12,7 @@ build: clean
 	go build -o bin/ ./cmd/...
 	@echo "Build completed."
 
-build-image: build
+build-images: build
 	@echo "Building docker image..."
 	script/build-image.sh
 
