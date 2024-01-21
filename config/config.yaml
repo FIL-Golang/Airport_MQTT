@@ -2,7 +2,7 @@ name: ${NAME:mqtt2mongodb}
 
 datasource:
   url: ${MONGODB_URL:mongodb://localhost:27017}
-  username: ${MONGODB_USERNAME:t}
+  username: ${MONGODB_USERNAME:}
   password: ${MONGODB_PASSWORD:}
 
 mqttBroker:

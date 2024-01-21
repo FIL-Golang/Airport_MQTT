@@ -20,6 +20,7 @@ const (
 )
 
 func Parse(message mqtt.Message) (error, model.SensorData) {
+
 	sensorData := model.SensorData{}
 	err := parseTopic(message, &sensorData)
 	if err != nil {

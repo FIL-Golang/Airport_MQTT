@@ -16,8 +16,10 @@ const (
 
 type SensorDataRepository interface {
 	Store(sensor model.SensorData) error
+	GetDistinctAirportCodes() ([]string, error)
 	FindAllSensor(filter Filter) ([]model.Sensor, error)
 	FindAllReading(filter Filter) ([]model.Sensor, error)
+	GetLastReading(filter Filter) (model.SensorData, error)
 	GetAvg(filter Filter) ([]model.Average, error)
 }
 
@@ -57,6 +59,42 @@ type Filter struct {
 	Type        model.Nature
 	From        time.Time
 	To          time.Time
+}
+
+func (r *SensorDataMongoRepository) GetDistinctAirportCodes() ([]string, error) {
+	coll := r.getCollection()
+
+	pipeline := mongo.Pipeline{
+		bson.D{{"$group", bson.D{{"_id", "$metadata.airportIATA"}}}},
+	}
+
+	cursor, err := coll.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(cursor, context.Background())
+
+	var results []string
+	for cursor.Next(context.Background()) {
+		var result struct {
+			ID string `bson:"_id"`
+		}
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		results = append(results, result.ID)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func (r *SensorDataMongoRepository) FindAllSensor(filter Filter) ([]model.Sensor, error) {
@@ -167,6 +205,37 @@ func (r *SensorDataMongoRepository) GetAvg(filter Filter) ([]model.Average, erro
 	}
 
 	return res, nil
+}
+
+func (r *SensorDataMongoRepository) GetLastReading(filter Filter) (model.SensorData, error) {
+	coll := r.getCollection()
+	matchStage := bson.D{{"$match", buildFilter(filter)}}
+	sortStage := bson.D{{"$sort", bson.D{{"timestamp", -1}}}}
+	limitStage := bson.D{{"$limit", 1}}
+
+	pipeline := mongo.Pipeline{matchStage, sortStage, limitStage}
+
+	cursor, err := coll.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return model.SensorData{}, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(cursor, context.Background())
+
+	var sensorData []model.SensorData
+	if err = cursor.All(context.Background(), &sensorData); err != nil {
+		return model.SensorData{}, err
+	}
+
+	if len(sensorData) == 0 {
+		return model.SensorData{}, fmt.Errorf("no readings found")
+	}
+
+	return sensorData[0], nil
 }
 
 func (r *SensorDataMongoRepository) getCollection() *mongo.Collection {

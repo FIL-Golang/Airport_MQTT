@@ -1,9 +1,9 @@
 file:
-  path: "C:\Users\cleme\OneDrive\Documents\cours\architechtures_distribuees\golang\Airport_MQTT\records"
+  path:
 
 mqtt:
   broker:
-    url: tcp://localhost:1883
+    url: localhost:1883
     username:
     password:
   client:
