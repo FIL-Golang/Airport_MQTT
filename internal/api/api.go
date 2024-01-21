@@ -194,7 +194,7 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 	debut := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
 
-	reelType := model.SensorNatureFromString(typeParam)
+	reelType := model.SensorTypeFromString(typeParam)
 
 	filter := persist.Filter{
 		AirportIATA: airportIATA,
@@ -266,7 +266,7 @@ func (controller *RestController) OnTimeList(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	reelType := model.SensorNatureFromString(typeParam)
+	reelType := model.SensorTypeFromString(typeParam)
 	if reelType == model.Undefined {
 		w.WriteHeader(http.StatusBadRequest)
 		errorResponse := ErrorResponse{Error: "Problème lors de la conversion du type"}

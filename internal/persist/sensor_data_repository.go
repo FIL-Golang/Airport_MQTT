@@ -37,7 +37,7 @@ func toBson(sensorData model.SensorData) bson.M {
 		"metadata": bson.M{
 			"sensorId":    sensorData.SensorId,
 			"airportIATA": sensorData.AirportIATA,
-			"sensorType":  sensorData.Nature,
+			"sensorType":  sensorData.Type,
 		},
 		"value":     sensorData.Value,
 		"timestamp": sensorData.Timestamp,
@@ -56,7 +56,7 @@ func (r *SensorDataMongoRepository) Store(sensor model.SensorData) error {
 type Filter struct {
 	SensorId    string
 	AirportIATA string
-	Type        model.Nature
+	Type        model.Type
 	From        time.Time
 	To          time.Time
 }

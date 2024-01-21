@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-type Nature int
+type Type int
 
 const (
-	Undefined Nature = iota
+	Undefined Type = iota
 	Temperature
 	WindSpeed
 	Pressure
@@ -18,24 +18,24 @@ const (
 type SensorData struct {
 	SensorId    string  // format: <uuid>
 	AirportIATA string  // format: <3 letters>
-	Nature      Nature  // 0: temperature, 1: pressure, 2: wind speed
+	Type        Type    // 0: temperature, 1: pressure, 2: wind speed
 	Value       float32 // value of the sensor
 	Timestamp   time.Time
 }
 
-func (nature Nature) String() string {
-	return [...]string{"undefined", "temperature", "wind_speed", "pressure"}[nature]
+func (_type Type) String() string {
+	return [...]string{"undefined", "temperature", "wind_speed", "pressure"}[_type]
 }
 
 // MarshalJSON marshals the enum as a quoted json string
 // Permit to send the string instead of the int when using json.Marshal
-func (nature Nature) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + nature.String() + `"`), nil
+func (_type Type) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + _type.String() + `"`), nil
 }
 
-func SensorNatureFromString(nature string) Nature {
-	fmt.Println("PARSING NATURE: ", nature)
-	switch nature {
+func SensorTypeFromString(_type string) Type {
+	fmt.Println("PARSING TYPE: ", _type)
+	switch _type {
 	case "temperature":
 		return Temperature
 	case "pressure":
@@ -52,7 +52,7 @@ func SensorNatureFromString(nature string) Nature {
 type Sensor struct {
 	SensorId    string    `bson:"sensorId" json:"sensorId"`
 	AirportIATA string    `bson:"airportIATA" json:"airportIATA"`
-	Type        Nature    `bson:"sensorType" json:"sensorType"`
+	Type        Type      `bson:"sensorType" json:"sensorType"`
 	Readings    []Reading `bson:"readings" json:"readings,omitempty"`
 }
 
@@ -63,5 +63,5 @@ type Reading struct {
 
 type Average struct {
 	Avg        float64 `bson:"avg"`
-	SensorType Nature  `bson:"sensorType"`
+	SensorType Type    `bson:"sensorType"`
 }

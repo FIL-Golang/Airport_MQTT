@@ -1,8 +1,5 @@
 package config
 
-// Si possible de refactor pour ne pas avoir toutes les configs qui se répètent dans chaque executable
-// Avec interface{} ??? (voir si possible) j'ai essayé, mais pas réussi
-
 type Config struct {
 	Datasource DatasourceConfig `yaml:"datasource"`
 	Mqtt       MqttConfig       `yaml:"mqtt"`

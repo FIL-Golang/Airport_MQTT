@@ -34,7 +34,7 @@ function MqttComponent(props: MqttComponentProps) {
         client.on('connect', () => {
             console.log('MQTT client connected');
             for (let sensor of props.sensorList) {
-                client.subscribe("airport/" + props.airport + "/sensor/" +sensor.sensorType + '/#');
+                client.subscribe("/airports/" + props.airport + "/sensors/" +sensor.sensorType + '/#');
             }
         });
 
