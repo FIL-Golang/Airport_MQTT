@@ -39,7 +39,7 @@ func writeSensorData(data model.SensorData) error {
 		return err
 	}
 
-	dataTypeDir := filepath.Join(airportDir, data.Nature.String())
+	dataTypeDir := filepath.Join(airportDir, data.Type.String())
 	if err := os.MkdirAll(dataTypeDir, os.ModePerm); err != nil {
 		return err
 	}

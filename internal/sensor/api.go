@@ -47,7 +47,7 @@ func (s *Sensor) processWeatherData(weatherData WeatherResponse, measurement str
 	return model.SensorData{
 		SensorId:    s.DeviceId,
 		AirportIATA: s.AirportIATA,
-		Nature:      model.SensorNatureFromString(s.Type),
+		Type:        model.SensorTypeFromString(s.Type),
 		Value:       float32(measureValue),
 		Timestamp:   time.Now(),
 	}

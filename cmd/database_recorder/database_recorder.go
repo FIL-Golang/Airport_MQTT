@@ -5,7 +5,6 @@ import (
 	"Airport_MQTT/internal/database_recorder"
 	"Airport_MQTT/internal/mqttUtils"
 	"fmt"
-	"os"
 )
 
 const (
@@ -13,12 +12,7 @@ const (
 )
 
 func init() {
-	args := os.Args
-	if len(args) != 2 {
-		fmt.Println("Usage: database_recorder <config_file>")
-		os.Exit(1)
-	}
-	config.LoadConfig(args[1])
+	config.LoadConfig()
 }
 
 func main() {

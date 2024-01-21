@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"Airport_MQTT/internal/config"
 	"Airport_MQTT/internal/model"
 	"Airport_MQTT/internal/mqttUtils"
 	"fmt"
@@ -42,13 +43,14 @@ func NewSensor(sensorInterface SensorInterface, sensorId string, iataCode string
 }
 
 func (s Sensor) SendToBroker(data model.SensorData) {
-	topic := mqttUtils.GetTopic(data, "sensor")
+	topic := mqttUtils.GetTopic(data, "sensors")
+	message := fmt.Sprintf("{\"TypeMeasure\": \"%s\", \"Value\": %f, \"Timestamp\": \"%s\"}",
+		data.Type, data.Value, data.Timestamp.Format("2006-01-02-15-04-05"))
+
 	req := s.BrokerMqtt.Publish(
-		topic, 1, false,
-		fmt.Sprintf("timestamp:%s\nvalue:%f\n", data.Timestamp.Format("2006-01-02-15-04-05"), data.Value),
-	)
+		topic, byte(config.GetMqttConfig().Client.QOS), false, message)
 	req.Wait()
-	fmt.Printf("TypeMeasure: %s, Value: %f, Timestamp: %s\n", data.Nature, data.Value, data.Timestamp)
+	fmt.Printf("TypeMeasure: %s, Value: %f, Timestamp: %s\n", data.Type, data.Value, data.Timestamp)
 }
 
 func (s Sensor) StartSensor() {

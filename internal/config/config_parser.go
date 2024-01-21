@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 
@@ -9,10 +10,15 @@ import (
 
 var config Config
 
-func LoadConfig(path string) {
+func LoadConfig() {
+	args := os.Args
+	if len(args) != 2 {
+		fmt.Println("Usage: No <config_file>")
+		os.Exit(1)
+	}
 	config = Config{}
 
-	err := LoadValuesFromYaml(&config, path)
+	err := LoadValuesFromYaml(&config, args[1])
 	if err != nil {
 		panic(err)
 	}
@@ -72,9 +78,7 @@ func GetMqttConfig() MqttConfig {
 	return config.Mqtt
 }
 
-func GetAlerts() []Alert { //TODO : same
-	return config.Alerts
-}
+func GetAlerts() []Alert { return config.Alerts }
 
 func GetSensorConfig() SensorConfig {
 	return config.Sensor
