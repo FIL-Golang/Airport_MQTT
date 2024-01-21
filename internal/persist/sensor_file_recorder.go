@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+
+	"github.com/joho/godotenv"
 )
 
 type SensorFileRecorder interface {
@@ -33,8 +36,11 @@ func (r *sensorFileRecorder) Store(data model.SensorData) (err error) {
 
 func writeSensorData(data model.SensorData) error {
 	fileConfig := config.GetFileConfig()
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(filepath.Dir(filepath.Dir(b)))
+	err := godotenv.Load(filepath.Join(basepath, "../../.env"))
 
-	airportDir := filepath.Join(fileConfig.Path, data.AirportIATA)
+	airportDir := filepath.Join(filepath.Join(basepath, fileConfig.Path), data.AirportIATA)
 	if err := os.MkdirAll(airportDir, os.ModePerm); err != nil {
 		return err
 	}

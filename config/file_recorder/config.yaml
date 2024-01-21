@@ -1,5 +1,5 @@
 file:
-  path: "C:/Users/cleme/OneDrive/Documents/cours/architectures_distribuees/golang/Airport_MQTT/records"
+  path: "/records"
 
 mqtt:
   broker:
