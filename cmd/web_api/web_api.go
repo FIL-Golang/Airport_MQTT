@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "Airport_MQTT/cmd/web_api/docs"
 	"Airport_MQTT/internal/api"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -12,11 +13,11 @@ import (
 func main() {
 	r := mux.NewRouter()
 	controller := api.NewRestController()
-  
+
 	r.HandleFunc("/dailyAverage", controller.DailyAverage).
 		Queries("day", "{day}").
 		Methods("GET")
-  
+
 	r.HandleFunc("/onTimeList", controller.OnTimeList).
 		Queries("from", "{from}", "to", "{to}", "type", "{type}").
 		Methods("GET")

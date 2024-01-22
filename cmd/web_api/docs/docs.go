@@ -14,7 +14,361 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/dailyAverage": {
+            "get": {
+                "description": "Get daily averages for temperature, pressure, and wind speed or everything.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get daily averages",
+                "operationId": "get-daily-averages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Airport IATA code",
+                        "name": "airportIATA",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date in the format '02-01-2006'",
+                        "name": "day",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Type of sensor data (temperature, pressure, wind_speed)",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SensorDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/distinctAirportCodes": {
+            "get": {
+                "description": "Retrieve a list of all distinct airport IATA codes from the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get distinct airport codes",
+                "operationId": "get-distinct-airport-codes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/lastReadingForSensor": {
+            "get": {
+                "description": "Retrieve the last reading from a specific sensor, optionally filtered by airport IATA code.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get the last reading for a specific sensor",
+                "operationId": "get-last-reading-for-sensor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sensor ID",
+                        "name": "sensorId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Airport IATA Code",
+                        "name": "airportIATA",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SensorData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/onTimeList": {
+            "get": {
+                "description": "Get every measures by a type.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get readings by type",
+                "operationId": "on-time-list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Date in the format '02-01-2006'",
+                        "name": "day",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Type of sensor data (temperature, pressure, wind_speed)",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SensorDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/readingsForSensor": {
+            "get": {
+                "description": "Retrieve all readings from a specific sensor, optionally filtered by airport IATA code.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all readings for a specific sensor",
+                "operationId": "get-all-readings-for-sensor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sensor ID",
+                        "name": "sensorId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Airport IATA Code",
+                        "name": "airportIATA",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Sensor"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sensorsForAirport": {
+            "get": {
+                "description": "Retrieve all sensors associated with a given airport IATA code.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all sensors for a specific airport",
+                "operationId": "get-all-sensors-for-airport",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Airport IATA Code",
+                        "name": "airportIATA",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Sensor"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.SensorDataResponse": {
+            "type": "object",
+            "properties": {
+                "avg": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Average"
+                    }
+                },
+                "jour": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Average": {
+            "type": "object",
+            "properties": {
+                "avg": {
+                    "type": "number"
+                },
+                "sensorType": {
+                    "$ref": "#/definitions/model.Type"
+                }
+            }
+        },
+        "model.Reading": {
+            "type": "object",
+            "properties": {
+                "timestamp": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "model.Sensor": {
+            "type": "object",
+            "properties": {
+                "airportIATA": {
+                    "type": "string"
+                },
+                "readings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Reading"
+                    }
+                },
+                "sensorId": {
+                    "type": "string"
+                },
+                "sensorType": {
+                    "$ref": "#/definitions/model.Type"
+                }
+            }
+        },
+        "model.SensorData": {
+            "type": "object",
+            "properties": {
+                "airportIATA": {
+                    "description": "format: \u003c3 letters\u003e",
+                    "type": "string"
+                },
+                "sensorId": {
+                    "description": "format: \u003cuuid\u003e",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "0: temperature, 1: pressure, 2: wind speed",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Type"
+                        }
+                    ]
+                },
+                "value": {
+                    "description": "value of the sensor",
+                    "type": "number"
+                }
+            }
+        },
+        "model.Type": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "Undefined",
+                "Temperature",
+                "WindSpeed",
+                "Pressure"
+            ]
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

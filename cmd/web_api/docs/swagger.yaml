@@ -1,4 +1,242 @@
+definitions:
+  api.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  api.SensorDataResponse:
+    properties:
+      avg:
+        items:
+          $ref: '#/definitions/model.Average'
+        type: array
+      jour:
+        type: string
+    type: object
+  model.Average:
+    properties:
+      avg:
+        type: number
+      sensorType:
+        $ref: '#/definitions/model.Type'
+    type: object
+  model.Reading:
+    properties:
+      timestamp:
+        type: string
+      value:
+        type: number
+    type: object
+  model.Sensor:
+    properties:
+      airportIATA:
+        type: string
+      readings:
+        items:
+          $ref: '#/definitions/model.Reading'
+        type: array
+      sensorId:
+        type: string
+      sensorType:
+        $ref: '#/definitions/model.Type'
+    type: object
+  model.SensorData:
+    properties:
+      airportIATA:
+        description: 'format: <3 letters>'
+        type: string
+      sensorId:
+        description: 'format: <uuid>'
+        type: string
+      timestamp:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/model.Type'
+        description: '0: temperature, 1: pressure, 2: wind speed'
+      value:
+        description: value of the sensor
+        type: number
+    type: object
+  model.Type:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - Undefined
+    - Temperature
+    - WindSpeed
+    - Pressure
 info:
   contact: {}
-paths: {}
+paths:
+  /dailyAverage:
+    get:
+      description: Get daily averages for temperature, pressure, and wind speed or
+        everything.
+      operationId: get-daily-averages
+      parameters:
+      - description: Airport IATA code
+        in: query
+        name: airportIATA
+        type: string
+      - description: Date in the format '02-01-2006'
+        in: query
+        name: day
+        required: true
+        type: string
+      - description: Type of sensor data (temperature, pressure, wind_speed)
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SensorDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get daily averages
+  /distinctAirportCodes:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all distinct airport IATA codes from the database.
+      operationId: get-distinct-airport-codes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get distinct airport codes
+  /lastReadingForSensor:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the last reading from a specific sensor, optionally filtered
+        by airport IATA code.
+      operationId: get-last-reading-for-sensor
+      parameters:
+      - description: Sensor ID
+        in: query
+        name: sensorId
+        required: true
+        type: string
+      - description: Airport IATA Code
+        in: query
+        name: airportIATA
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SensorData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get the last reading for a specific sensor
+  /onTimeList:
+    get:
+      consumes:
+      - application/json
+      description: Get every measures by a type.
+      operationId: on-time-list
+      parameters:
+      - description: Date in the format '02-01-2006'
+        in: query
+        name: day
+        required: true
+        type: string
+      - description: Type of sensor data (temperature, pressure, wind_speed)
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SensorDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get readings by type
+  /readingsForSensor:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all readings from a specific sensor, optionally filtered
+        by airport IATA code.
+      operationId: get-all-readings-for-sensor
+      parameters:
+      - description: Sensor ID
+        in: query
+        name: sensorId
+        required: true
+        type: string
+      - description: Airport IATA Code
+        in: query
+        name: airportIATA
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Sensor'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get all readings for a specific sensor
+  /sensorsForAirport:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all sensors associated with a given airport IATA code.
+      operationId: get-all-sensors-for-airport
+      parameters:
+      - description: Airport IATA Code
+        in: query
+        name: airportIATA
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Sensor'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get all sensors for a specific airport
 swagger: "2.0"

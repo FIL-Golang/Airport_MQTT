@@ -234,7 +234,7 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 // @Produce json
 // @Param day query string true "Date in the format '02-01-2006'"
 // @Param type query string true "Type of sensor data (temperature, pressure, wind_speed)"
-// @Success 200 {object} GlobalSensorDataResponse
+// @Success 200 {object} SensorDataResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /onTimeList [get]
 func (controller *RestController) OnTimeList(w http.ResponseWriter, r *http.Request) {
