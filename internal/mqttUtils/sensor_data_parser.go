@@ -20,6 +20,7 @@ const (
 )
 
 func Parse(message mqtt.Message) (error, model.SensorData) {
+
 	sensorData := model.SensorData{}
 	err := parseTopic(message, &sensorData)
 	if err != nil {
@@ -34,7 +35,7 @@ func Parse(message mqtt.Message) (error, model.SensorData) {
 func parseTopic(message mqtt.Message, data *model.SensorData) error {
 	splitTopic := strings.Split(message.Topic(), "/")
 	data.SensorId = splitTopic[posSensorId]
-	data.Nature = model.SensorNatureFromString(splitTopic[posSensorType])
+	data.Type = model.SensorTypeFromString(splitTopic[posSensorType])
 	data.AirportIATA = splitTopic[posAirportIATA]
 	return nil
 }
@@ -58,7 +59,7 @@ func parsePayload(message mqtt.Message, data *model.SensorData) error {
 }
 
 func GetTopic(sensorData model.SensorData, typ string) string {
-	return "/airports/" + sensorData.AirportIATA + "/" + typ + "/" + sensorData.Nature.String() + "/" + sensorData.SensorId
+	return "/airports/" + sensorData.AirportIATA + "/" + typ + "/" + sensorData.Type.String() + "/" + sensorData.SensorId
 }
 
 func GetSensorsTopic(sensor model.SensorData) string {

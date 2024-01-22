@@ -39,13 +39,12 @@ func writeSensorData(data model.SensorData) error {
 		return err
 	}
 
-	dataTypeDir := filepath.Join(airportDir, data.Nature.String())
+	dataTypeDir := filepath.Join(airportDir, data.Type.String())
 	if err := os.MkdirAll(dataTypeDir, os.ModePerm); err != nil {
 		return err
 	}
 
-	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s.csv", data.Timestamp.Format("2006-01-02")))
-	fmt.Println(fileName)
+	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s-%s-%s.csv", data.AirportIATA, data.Timestamp.Format("2006-01-02"), data.Type.String()))
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
@@ -60,11 +59,11 @@ func writeSensorData(data model.SensorData) error {
 		return err
 	}
 	if fileInfo.Size() == 0 {
-		header := []string{"Timestamp", "Value"}
+		header := []string{"Timestamp", "Value", "SensorId"}
 		writer.Write(header)
 	}
 
-	row := []string{data.Timestamp.String(), fmt.Sprintf("%.2f", data.Value)}
+	row := []string{data.Timestamp.Format("15:04:05"), fmt.Sprintf("%.2f", data.Value), data.SensorId}
 	writer.Write(row)
 
 	return nil

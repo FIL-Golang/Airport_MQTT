@@ -3,19 +3,13 @@ package persist
 import (
 	"Airport_MQTT/internal/config"
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
+	"log/slog"
 )
 
 func init() {
-	args := os.Args
-	if len(args) != 2 {
-		fmt.Println("Usage: file_recorder <config_file>")
-		os.Exit(1)
-	}
-	config.LoadConfig(args[1])
+	config.LoadConfig()
 }
 
 func NewMongoClient() *mongo.Client {
@@ -24,7 +18,9 @@ func NewMongoClient() *mongo.Client {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(datasourceConfig.Url).SetServerAPIOptions(serverAPI)
 
+	slog.Info("Connecting to MongoDB")
 	client, err := mongo.Connect(context.TODO(), opts)
+	slog.Info("Connected to MongoDB")
 
 	if err != nil {
 		panic(err)

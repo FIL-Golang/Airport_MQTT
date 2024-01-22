@@ -4,8 +4,8 @@ import (
 	"Airport_MQTT/internal/config"
 	"Airport_MQTT/internal/model"
 	"Airport_MQTT/internal/mqttUtils"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"log/slog"
 )
 
 type AlertManagerMqttHandler struct {
@@ -21,7 +21,7 @@ func NewAlertManagerMqttHandler() *AlertManagerMqttHandler {
 func (this *AlertManagerMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
 	err, data := mqttUtils.Parse(msg)
 	if err != nil {
-		println(err.Error())
+		slog.Error("Error parsing message: " + err.Error())
 		return
 	}
 
@@ -29,20 +29,20 @@ func (this *AlertManagerMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Me
 
 	for _, alert := range alerts {
 		if alert.Airport == data.AirportIATA {
-			if data.Nature == model.Temperature {
+			if data.Type == model.Temperature {
 				if data.Value > float32(alert.Temperature) {
 					this.publishAlert(client, data, "Alerte température")
-					fmt.Println("Alerte température")
+					slog.Info("Alerte température")
 				}
-			} else if data.Nature == model.Pressure {
+			} else if data.Type == model.Pressure {
 				if data.Value > float32(alert.Pressure) {
 					this.publishAlert(client, data, "Alerte pression")
-					fmt.Println("Alerte pression")
+					slog.Info("Alerte pression")
 				}
-			} else if data.Nature == model.WindSpeed {
+			} else if data.Type == model.WindSpeed {
 				if data.Value > float32(alert.Wind) {
 					this.publishAlert(client, data, "Alerte vitesse du vent")
-					fmt.Println("Alerte vitesse du vent")
+					slog.Info("Alerte vitesse du vent")
 				}
 			}
 		}
@@ -50,5 +50,5 @@ func (this *AlertManagerMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Me
 }
 
 func (h *AlertManagerMqttHandler) publishAlert(client mqtt.Client, data model.SensorData, message string) {
-	client.Publish(mqttUtils.GetAlertsTopic(data), 0, false, message)
+	client.Publish(mqttUtils.GetAlertsTopic(data), byte(config.GetMqttConfig().Client.QOS), false, message)
 }

@@ -3,17 +3,10 @@ package main
 import (
 	"Airport_MQTT/internal/config"
 	"Airport_MQTT/internal/sensor"
-	"fmt"
-	"os"
 )
 
 func init() {
-	args := os.Args
-	if len(args) != 2 {
-		fmt.Println("Usage: database_recorder <config_file>")
-		os.Exit(1)
-	}
-	config.LoadConfig(args[1])
+	config.LoadConfig()
 }
 
 func main() {

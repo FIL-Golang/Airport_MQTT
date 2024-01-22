@@ -11,5 +11,5 @@ sensor:
   frequency: 2
 
 api:
-  url: http://api.weatherstack.com/
+  url: http://api.weatherstack.com/current?access_key=%s&query=%s
   secretKey:
