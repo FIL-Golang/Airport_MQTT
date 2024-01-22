@@ -1,5 +1,5 @@
 file:
-  path: "./records"
+  path: "/records"
 
 mqtt:
   broker:
