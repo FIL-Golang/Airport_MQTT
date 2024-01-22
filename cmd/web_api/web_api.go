@@ -12,12 +12,14 @@ import (
 func main() {
 	r := mux.NewRouter()
 	controller := api.NewRestController()
-
+  
 	r.HandleFunc("/dailyAverage", controller.DailyAverage).
-		Queries("day", "{day}")
-
+		Queries("day", "{day}").
+		Methods("GET")
+  
 	r.HandleFunc("/onTimeList", controller.OnTimeList).
-		Queries("from", "{from}", "to", "{to}", "type", "{type}")
+		Queries("from", "{from}", "to", "{to}", "type", "{type}").
+		Methods("GET")
 
 	r.HandleFunc("/distinctAirportCodes", controller.GetDistinctAirportCodes)
 

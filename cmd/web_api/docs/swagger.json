@@ -1,7 +1,161 @@
 {
     "swagger": "2.0",
     "info": {
+        "title": "AirportMQTT API",
+        "description": "Display of readings et average specifying type and/or date.",
+        "version": "1.0.0",
         "contact": {}
     },
-    "paths": {}
+    "paths": {
+        "/dailyAverage": {
+            "get": {
+                "tags": [
+                    "dailyAverage"
+                ],
+                "summary": "Get daily average",
+                "description": "Get daily average of every type of sensor, you can optionally specify one",
+                "operationId": "getDailyAverage",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "day",
+                        "in": "query",
+                        "description": "date",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "type of sensor",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "airportIATA",
+                        "in": "query",
+                        "description": "ID of the airport",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "jour": {
+                                    "type": "string",
+                                    "example": "16-01-2024"
+                                },
+                                "avg": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Avg": {
+                                                "type": "number",
+                                                "example": "12.5"
+                                            },
+                                            "SensorType": {
+                                                "type": "string",
+                                                "example": "temperature"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/onTimeList": {
+            "get": {
+                "tags": [
+                    "onTimeList"
+                ],
+                "summary": "Get on time list",
+                "description": "Get list of readings between two dates given, type can be optionally added",
+                "operationId": "getOnTimeList",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "type of sensor",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "beginning of the readings",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "end of the readings",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "sensorId": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "airportIATA": {
+                                        "type": "string",
+                                        "example": "DBX"
+                                    },
+                                    "sensorType": {
+                                        "type": "string",
+                                        "example": "temperature"
+                                    },
+                                    "readings": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "timestamp": {
+                                                    "type": "string",
+                                                    "example": "2024-01-16T16:47:16.119Z"
+                                                },
+                                                "value": {
+                                                    "type": "number",
+                                                    "example": "24.08983"
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        }
+    }
 }

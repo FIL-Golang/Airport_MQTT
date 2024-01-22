@@ -167,11 +167,11 @@ func (controller *RestController) GetLastReadingForSensor(w http.ResponseWriter,
 // @Summary Get daily averages
 // @Description Get daily averages for temperature, pressure, and wind speed or everything.
 // @ID get-daily-averages
-// @Accept json
 // @Produce json
+// @Param airportIATA query string false "Airport IATA code"
 // @Param day query string true "Date in the format '02-01-2006'"
 // @Param type query string false "Type of sensor data (temperature, pressure, wind_speed)"
-// @Success 200 {object} GlobalSensorDataResponse
+// @Success 200 {object} SensorDataResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /dailyAverage [get]
 func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Request) {
@@ -179,7 +179,6 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 	paramDay := r.URL.Query().Get("day")
 	airportIATA := r.URL.Query().Get("airportIATA")
 
-	// Convertion de la chaîne de caractères de la date en objet time.Time
 	date, err := parseDate(paramDay)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -191,7 +190,6 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Creation des objets time.Time pour le début et la fin de la journee
 	debut := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 	fin := time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 999999999, date.Location())
 
@@ -229,7 +227,7 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 }
 
 // OnTimeList godoc
-// @Summary Get daily averages
+// @Summary Get readings by type
 // @Description Get every measures by a type.
 // @ID on-time-list
 // @Accept json
