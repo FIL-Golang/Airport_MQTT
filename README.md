@@ -3,7 +3,7 @@
 
 ## Architecture 
 
-![Architecture Airport Monitoring](https://i.imgur.com/HrZwsRp.png)
+![Architecture Airport Monitoring](https://i.imgur.com/2bo3grM.png)
 
 ## API REST
 
@@ -25,6 +25,7 @@ Le Frontend SPA (Single Page Application) propose une interface utilisateur inte
 
 ```javascript
 cd frontend-spa
+npm install
 npm run dev
 ```
 
