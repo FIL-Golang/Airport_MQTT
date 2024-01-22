@@ -16,3 +16,8 @@ test:
 	@echo "Running tests..."
 	go test -v ./...
 	@echo "Tests completed."
+
+docker-build:
+	@echo "Building images..."
+	scripts/build-images.sh
+	@echo "Build completed."
