@@ -148,27 +148,27 @@ function App() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <LineChart
-                                        data={transformedData}
-                                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                        <XAxis dataKey="date" />
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <YAxis yAxisId="left" orientation="left" />
-                                        <Tooltip />
-                                        <Legend />
-                                        {sensorList.map((sensor, index) => (
-                                            <Line
-                                                key={index}
-                                                yAxisId="left"
-                                                type="monotone"
-                                                dataKey={sensor.sensorType}
-                                                stroke={colors[sensor.sensorType]}
-                                                activeDot={{ r: 8 }}
-                                            />
-                                        ))}
-                                    </LineChart>
-                                </ResponsiveContainer>
+                                {sensorList.map((sensor, index) => (
+                                    <ResponsiveContainer width="100%" height={300} key={index}>
+                                        <LineChart
+                                            data={transformedData}
+                                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                            <XAxis dataKey="date" />
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <YAxis yAxisId="left" orientation="left" />
+                                            <Tooltip />
+                                            <Legend />
+                                                <Line
+                                                    key={index}
+                                                    yAxisId="left"
+                                                    type="monotone"
+                                                    dataKey={sensor.sensorType}
+                                                    stroke={colors[sensor.sensorType]}
+                                                    activeDot={{ r: 8 }}
+                                                />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                ))}
                             </CardContent>
                         </Card>
                     </div>
