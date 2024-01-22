@@ -21,7 +21,7 @@ func NewAlertManagerMqttHandler() *AlertManagerMqttHandler {
 func (this *AlertManagerMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
 	err, data := mqttUtils.Parse(msg)
 	if err != nil {
-		slog.Error("Error parsing message: ", err)
+		slog.Error("Error parsing message: " + err.Error())
 		return
 	}
 

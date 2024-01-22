@@ -206,7 +206,7 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 
 	avg, err := controller.repository.GetAvg(filter)
 	if err != nil {
-		slog.Debug("Error while retrieving average: %v", err)
+		slog.Debug("Error while retrieving average: " + err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		errorResponse := ErrorResponse{Error: "Problème lors de la récupération de la moyenne"}
 		err := json.NewEncoder(w).Encode(errorResponse)

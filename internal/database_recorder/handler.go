@@ -23,12 +23,12 @@ func (handler *DatabaseRecorderMqttHandler) HandleValue(client mqtt.Client, msg 
 	fmt.Printf("Received value : %s on topic: %s\n", msg.Payload(), msg.Topic())
 	err, data := mqttUtils.Parse(msg)
 	if err != nil {
-		slog.Error("Error parsing message: ", err)
+		slog.Error("Error parsing message: " + err.Error())
 		return
 	}
 	err = handler.repository.Store(data)
 	if err != nil {
-		slog.Error("Error storing data: ", err)
+		slog.Error("Error storing data: " + err.Error())
 		return
 	}
 }

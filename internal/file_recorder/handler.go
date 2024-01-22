@@ -20,14 +20,14 @@ func NewFileRecoderMqttHandler() *FileRecoderMqttHandler {
 }
 
 func (handler *FileRecoderMqttHandler) HandleValue(client mqtt.Client, msg mqtt.Message) {
-	slog.Info("Received value : ", msg.Payload(), " on topic: ", msg.Topic())
+	slog.Info("Received value : " + string(msg.Payload()) + " on topic: " + msg.Topic())
 	err, data := mqttUtils.Parse(msg)
 	if err != nil {
-		slog.Error("Error while parsing data: ", err.Error())
+		slog.Error("Error while parsing data: " + err.Error())
 		return
 	}
 	err = handler.recorder.Store(data)
 	if err != nil {
-		slog.Error("Error while storing data: ", err.Error())
+		slog.Error("Error while storing data: " + err.Error())
 	}
 }

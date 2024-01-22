@@ -57,7 +57,7 @@ func (s Sensor) SendToBroker(data model.SensorData) {
 func (s Sensor) StartSensor() {
 	location := iata.IATATimeZone(s.AirportIATA)
 	if location.City == "" {
-		slog.Error("IATA not supported : ", s.AirportIATA)
+		slog.Error("IATA not supported : " + s.AirportIATA)
 		return
 	}
 
