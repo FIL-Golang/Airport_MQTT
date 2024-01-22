@@ -68,9 +68,12 @@ function App() {
 
             let promises = sensorsList.map(async (sensor: { sensorType: string; airportIATA: any; sensorId: any; }) => {
                 try {
-                    const response = await fetch(`${process.env.REACT_APP_API_URL}/lastReadingForSensor?sensorId=${sensor.sensorId}&airportIATA=${sensor.airportIATA}`);
-                    const data = await response.json();
-                    let lastReading = data.Value ? parseFloat(data.Value).toFixed(1) : 'Aucune donnée';
+                    const today = new Date();
+                    const formattedDate = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getFullYear()}`;
+
+                    const responseAvg = await fetch(`${process.env.REACT_APP_API_URL}/dailyAverage?day=${formattedDate}&type=${sensor.sensorType}&airportIATA=${sensor.airportIATA}`);
+                    const dataAvg = await responseAvg.json();
+                    let avg = dataAvg.avg && dataAvg.avg[0] && dataAvg.avg[0].Avg ? parseFloat(dataAvg.avg[0].Avg).toFixed(1) : 'Aucune donnée';
 
                     const responseReadings = await fetch(`${process.env.REACT_APP_API_URL}/readingsForSensor?sensorId=${sensor.sensorId}&airportIATA=${sensor.airportIATA}`);
                     const dataReadings = await responseReadings.json();
@@ -82,10 +85,10 @@ function App() {
                         });
                     });
 
-                    return { ...sensor, sensorType: sensor.sensorType, lastReading: lastReading, readings: readingsPerDate };
+                    return { ...sensor, sensorType: sensor.sensorType, avg: avg, readings: readingsPerDate };
                 } catch (error) {
                     console.error("Error fetching data for sensor", error);
-                    return { ...sensor, sensorType: sensor.sensorType, lastReading: 'Aucune donnée', readings: {} };
+                    return { ...sensor, sensorType: sensor.sensorType, avg: 'Aucune donnée', readings: {} };
                 }
             });
 
@@ -95,6 +98,7 @@ function App() {
             console.error("Error fetching sensor list", error);
         }
     };
+
 
     const handleSelectChange = (value: React.SetStateAction<string>) => {
         setSelectedAirport(value);
@@ -134,7 +138,7 @@ function App() {
                                     <CardDescription>Moyenne du capteur de {sensor.sensorType} sur la piste</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <h1 className="font-bold text-3xl">{sensor.lastReading}</h1>
+                                    <h1 className="font-bold text-3xl">{sensor.avg}</h1>
                                 </CardContent>
                             </Card>
                         ))}

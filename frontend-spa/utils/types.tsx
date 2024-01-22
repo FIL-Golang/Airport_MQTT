@@ -1,8 +1,8 @@
 export interface Sensor {
     sensorId: string,
     sensorType: string,
+    avg?: number,
     airportIATA: string,
-    lastReading?: number,
     readings?: string[],
 }
 

@@ -130,42 +130,6 @@ func (controller *RestController) GetAllReadingsForSensor(w http.ResponseWriter,
 	}
 }
 
-// GetLastReadingForSensor godoc
-// @Summary Get the last reading for a specific sensor
-// @Description Retrieve the last reading from a specific sensor, optionally filtered by airport IATA code.
-// @ID get-last-reading-for-sensor
-// @Accept json
-// @Produce json
-// @Param sensorId query string true "Sensor ID"
-// @Param airportIATA query string false "Airport IATA Code"
-// @Success 200 {object} model.SensorData
-// @Failure 500 {object} ErrorResponse
-// @Router /lastReadingForSensor [get]
-func (controller *RestController) GetLastReadingForSensor(w http.ResponseWriter, r *http.Request) {
-	sensorId := r.URL.Query().Get("sensorId")
-	airportIATA := r.URL.Query().Get("airportIATA")
-
-	filter := persist.Filter{
-		SensorId:    sensorId,
-		AirportIATA: airportIATA,
-	}
-	lastReading, err := controller.repository.GetLastReading(filter)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		err := json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to fetch the last reading: " + err.Error()})
-		if err != nil {
-			return
-		}
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(lastReading)
-	if err != nil {
-		return
-	}
-}
-
 // DailyAverage godoc
 // @Summary Get daily averages
 // @Description Get daily averages for temperature, pressure, and wind speed or everything.

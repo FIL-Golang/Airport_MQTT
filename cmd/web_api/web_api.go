@@ -31,9 +31,6 @@ func main() {
 	r.HandleFunc("/readingsForSensor", controller.GetAllReadingsForSensor).
 		Queries("sensorId", "{sensorId}", "airportIATA", "{airportIATA}")
 
-	r.HandleFunc("/lastReadingForSensor", controller.GetLastReadingForSensor).
-		Queries("sensorId", "{sensorId}", "airportIATA", "{airportIATA}")
-
 	//Swagger
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
