@@ -12,13 +12,22 @@ var config Config
 
 func LoadConfig() {
 	args := os.Args
-	if len(args) != 2 {
-		slog.Warn("Usage: <exe> <config file path>")
-		os.Exit(1)
+	var configPath string
+	if len(args) > 1 {
+		configPath = args[1]
+	} else {
+		//made for docker container to use with volume
+		slog.Warn("No config file path provided, using default location")
+		configPath = "./config.yaml"
 	}
 	config = Config{}
+	loadConfig(configPath)
+}
 
-	err := LoadValuesFromYaml(&config, args[1])
+func loadConfig(path string) {
+	config = Config{}
+
+	err := LoadValuesFromYaml(&config, path)
 	if err != nil {
 		panic(err)
 	}

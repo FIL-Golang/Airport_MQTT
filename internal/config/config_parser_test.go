@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -27,8 +26,6 @@ func TestLoadValueFromEnv(t *testing.T) {
 		t.Error(err)
 	}
 
-	fmt.Println(confStruct)
-
 	assert.Equal(t, "http://localhost:8080/DBTest", confStruct.Datasource.Url)
 	assert.Equal(t, "admin", confStruct.Datasource.Username)
 	assert.Equal(t, "admin", confStruct.Datasource.Password)
@@ -42,7 +39,6 @@ func TestLoadValueFromYaml(t *testing.T) {
 
 	err := LoadValuesFromYaml(&confStruct, testDataDir+"/config.yaml")
 	if err != nil {
-		fmt.Println(err)
 		t.Error(err)
 	}
 
@@ -58,7 +54,7 @@ func TestLoadConfig(t *testing.T) {
 	os.Setenv("DATASOURCE_USERNAME", "admin")
 	os.Setenv("DATASOURCE_PASSWORD", "admin")
 
-	LoadConfig(testDataDir + "/config.yaml")
+	loadConfig(testDataDir + "/config.yaml")
 
 	assert.Equal(t, "http://localhost:8080/DBTest", config.Datasource.Url)
 	assert.Equal(t, "admin", config.Datasource.Username)
@@ -69,7 +65,7 @@ func TestShouldGivePriorityToEnv(t *testing.T) {
 	os.Setenv("DATASOURCE_USERNAME", "")         //should let the yaml value
 	os.Setenv("DATASOURCE_PASSWORD", "password") //should override the yaml value
 
-	LoadConfig(testDataDir + "/config.yaml")
+	loadConfig(testDataDir + "/config.yaml")
 
 	assert.Equal(t, "http://localhost:8080/DBTest", config.Datasource.Url)
 	assert.Equal(t, "user", config.Datasource.Username)
