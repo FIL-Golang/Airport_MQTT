@@ -128,7 +128,7 @@ function App() {
                     )}
                     <div className="flex flex-row w-full gap-6">
                         {sensorList.map((sensor) => (
-                            <Card key={generateUniqueKey(sensor.sensorId)}>
+                            <Card key={generateUniqueKey(sensor.sensorId)} className={'w-full'}>
                                 <CardHeader>
                                     <CardTitle>{capitalizeFirstLetter(sensor.sensorType)}</CardTitle>
                                     <CardDescription>Moyenne du capteur de {sensor.sensorType} sur la piste</CardDescription>
