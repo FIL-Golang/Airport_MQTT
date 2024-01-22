@@ -5,6 +5,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log/slog"
 )
 
 func init() {
@@ -17,7 +18,9 @@ func NewMongoClient() *mongo.Client {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(datasourceConfig.Url).SetServerAPIOptions(serverAPI)
 
+	slog.Info("Connecting to MongoDB")
 	client, err := mongo.Connect(context.TODO(), opts)
+	slog.Info("Connected to MongoDB")
 
 	if err != nil {
 		panic(err)

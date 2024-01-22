@@ -7,6 +7,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/krisukox/google-flights-api/iata"
+	"log/slog"
 	"time"
 )
 
@@ -56,7 +57,7 @@ func (s Sensor) SendToBroker(data model.SensorData) {
 func (s Sensor) StartSensor() {
 	location := iata.IATATimeZone(s.AirportIATA)
 	if location.City == "" {
-		fmt.Println("IATA not supported : ", s.AirportIATA)
+		slog.Error("IATA not supported : ", s.AirportIATA)
 		return
 	}
 
