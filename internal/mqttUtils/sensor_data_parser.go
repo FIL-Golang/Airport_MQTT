@@ -22,27 +22,27 @@ const (
 func Parse(message mqtt.Message) (error, model.SensorData) {
 
 	sensorData := model.SensorData{}
-	err := parseTopic(message, &sensorData)
+	err := parseTopic(message.Topic(), &sensorData)
 	if err != nil {
 		return err, sensorData
 	}
-	err = parsePayload(message, &sensorData)
+	err = parsePayload(message.Payload(), &sensorData)
 	if err != nil {
 		return err, sensorData
 	}
 	return nil, sensorData
 }
-func parseTopic(message mqtt.Message, data *model.SensorData) error {
-	splitTopic := strings.Split(message.Topic(), "/")
+func parseTopic(topic string, data *model.SensorData) error {
+	splitTopic := strings.Split(topic, "/")
 	data.SensorId = splitTopic[posSensorId]
 	data.Type = model.SensorTypeFromString(splitTopic[posSensorType])
 	data.AirportIATA = splitTopic[posAirportIATA]
 	return nil
 }
 
-func parsePayload(message mqtt.Message, data *model.SensorData) error {
+func parsePayload(payloadByte []byte, data *model.SensorData) error {
 	pay := payload{}
-	err := json.Unmarshal(message.Payload(), &pay)
+	err := json.Unmarshal(payloadByte, &pay)
 	if err != nil {
 		return err
 	}
