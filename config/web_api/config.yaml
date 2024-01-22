@@ -5,4 +5,3 @@ datasource:
 
 web:
   port: 8080
-
