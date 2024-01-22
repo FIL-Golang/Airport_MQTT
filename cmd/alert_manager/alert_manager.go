@@ -20,7 +20,7 @@ func main() {
 
 	mqttHandler := alert_manager.NewAlertManagerMqttHandler()
 
-	slog.Info("Subscribing to topic: ", SubscribeTopic)
+	slog.Info("Subscribing to topic: " + SubscribeTopic)
 	mqttClient.Subscribe(SubscribeTopic, 0, mqttHandler.HandleValue)
 
 	select {}

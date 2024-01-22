@@ -11,3 +11,8 @@ build: clean
 	@echo "Building project..."
 	go build -o . -v ./...
 	@echo "Build completed."
+
+test:
+	@echo "Running tests..."
+	go test -v ./...
+	@echo "Tests completed."

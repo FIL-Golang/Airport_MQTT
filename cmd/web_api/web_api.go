@@ -37,11 +37,11 @@ func main() {
 
 	// Démarrer le serveur sur le port 8080
 	port := 8080
-	slog.Info("Starting server on port ", port)
+	slog.Info("Starting server on port " + fmt.Sprintf("%d", port))
 	//http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", 8080), nil)
 	if err != nil {
-		slog.Debug("Error starting server: ", err)
+		slog.Debug("Error starting server: " + err.Error())
 		return
 	}
 }
