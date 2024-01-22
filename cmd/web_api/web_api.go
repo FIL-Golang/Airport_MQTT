@@ -3,6 +3,7 @@ package main
 import (
 	_ "Airport_MQTT/cmd/web_api/docs"
 	"Airport_MQTT/internal/api"
+	"Airport_MQTT/internal/config"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger"
@@ -39,10 +40,10 @@ func main() {
 	http.Handle("/", r)
 
 	// Démarrer le serveur sur le port 8080
-	port := 8080
+	port := config.GetWebConfig().Port
 	slog.Info("Starting server on port " + fmt.Sprintf("%d", port))
 	//http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", 8080), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
 		slog.Debug("Error starting server: " + err.Error())
 		return

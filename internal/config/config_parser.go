@@ -91,3 +91,7 @@ func GetApiConfig() APIConfig {
 func GetFileConfig() File {
 	return config.File
 }
+
+func GetWebConfig() WebConfig {
+	return config.Web
+}

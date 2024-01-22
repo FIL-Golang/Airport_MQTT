@@ -87,6 +87,7 @@ func (controller *RestController) GetAllSensorsForAirport(w http.ResponseWriter,
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(sensors)
 	if err != nil {
 		return
@@ -122,6 +123,7 @@ func (controller *RestController) GetAllReadingsForSensor(w http.ResponseWriter,
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(readings)
 	if err != nil {
 		return
@@ -157,6 +159,7 @@ func (controller *RestController) GetLastReadingForSensor(w http.ResponseWriter,
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(lastReading)
 	if err != nil {
 		return
