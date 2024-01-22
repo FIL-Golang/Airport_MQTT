@@ -1,0 +1,18 @@
+mqtt:
+  broker:
+    url: tls://2e0cec621e954a97b4917df783269b7e.s2.eu.hivemq.cloud:8883
+    username:
+    password:
+    client:
+      id: sensor
+      qos: 0
+
+sensor:
+  airportIATA: NTE
+  deviceId: c7f54d55-cd94-4c23-a5c1-5c381bb22cbe
+  sensorType: wind_speed
+  frequency: 10
+
+api:
+  url: http://api.weatherstack.com/current?access_key=%s&query=%s
+  secretKey:
