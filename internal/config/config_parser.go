@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"log/slog"
 	"os"
 	"reflect"
 
@@ -13,7 +13,7 @@ var config Config
 func LoadConfig() {
 	args := os.Args
 	if len(args) != 2 {
-		fmt.Println("Usage: No <config_file>")
+		slog.Warn("Usage: <exe> <config file path>")
 		os.Exit(1)
 	}
 	config = Config{}

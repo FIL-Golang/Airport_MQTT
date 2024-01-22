@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log/slog"
 	"time"
 )
 
@@ -75,7 +76,7 @@ func (r *SensorDataMongoRepository) GetDistinctAirportCodes() ([]string, error) 
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("error closing cursor")
 		}
 	}(cursor, context.Background())
 
@@ -193,7 +194,6 @@ func (r *SensorDataMongoRepository) GetAvg(filter Filter) ([]model.Average, erro
 	}
 
 	cursor, err := coll.Aggregate(context.Background(), request)
-	fmt.Println(cursor)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func (r *SensorDataMongoRepository) GetLastReading(filter Filter) (model.SensorD
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
-			fmt.Println(err)
+			slog.Debug("error closing cursor")
 		}
 	}(cursor, context.Background())
 

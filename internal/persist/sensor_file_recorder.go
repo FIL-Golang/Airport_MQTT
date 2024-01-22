@@ -45,7 +45,6 @@ func writeSensorData(data model.SensorData) error {
 	}
 
 	fileName := filepath.Join(dataTypeDir, fmt.Sprintf("%s.csv", data.Timestamp.Format("2006-01-02")))
-	fmt.Println(fileName)
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err

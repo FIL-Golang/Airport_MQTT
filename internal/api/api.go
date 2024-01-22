@@ -5,6 +5,7 @@ import (
 	"Airport_MQTT/internal/persist"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -205,8 +206,8 @@ func (controller *RestController) DailyAverage(w http.ResponseWriter, r *http.Re
 
 	avg, err := controller.repository.GetAvg(filter)
 	if err != nil {
+		slog.Debug("Error while retrieving average: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println(err)
 		errorResponse := ErrorResponse{Error: "Problème lors de la récupération de la moyenne"}
 		err := json.NewEncoder(w).Encode(errorResponse)
 		if err != nil {

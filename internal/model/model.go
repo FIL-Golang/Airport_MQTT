@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -23,19 +22,18 @@ type SensorData struct {
 	Timestamp   time.Time
 }
 
-func (_type Type) String() string {
-	return [...]string{"undefined", "temperature", "wind_speed", "pressure"}[_type]
+func (typ Type) String() string {
+	return [...]string{"undefined", "temperature", "wind_speed", "pressure"}[typ]
 }
 
 // MarshalJSON marshals the enum as a quoted json string
 // Permit to send the string instead of the int when using json.Marshal
-func (_type Type) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + _type.String() + `"`), nil
+func (typ Type) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + typ.String() + `"`), nil
 }
 
-func SensorTypeFromString(_type string) Type {
-	fmt.Println("PARSING TYPE: ", _type)
-	switch _type {
+func SensorTypeFromString(typ string) Type {
+	switch typ {
 	case "temperature":
 		return Temperature
 	case "pressure":

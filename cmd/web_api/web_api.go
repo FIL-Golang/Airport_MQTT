@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger"
+	"log/slog"
 	"net/http"
 )
 
@@ -36,11 +37,11 @@ func main() {
 
 	// Démarrer le serveur sur le port 8080
 	port := 8080
-	fmt.Printf("Serveur écoutant sur le port %d...\n", port)
+	slog.Info("Starting server on port ", port)
 	//http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", 8080), nil)
 	if err != nil {
-		fmt.Printf("Erreur : %v\n", err)
+		slog.Debug("Error starting server: ", err)
 		return
 	}
 }
