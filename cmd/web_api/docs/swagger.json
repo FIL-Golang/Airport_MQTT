@@ -45,7 +45,29 @@
                     "200": {
                         "description": "Successful operation",
                         "schema": {
-                            "type": "array"
+                            "type": "object",
+                            "properties": {
+                                "jour": {
+                                    "type": "string",
+                                    "example": "16-01-2024"
+                                },
+                                "avg": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Avg": {
+                                                "type": "number",
+                                                "example": "12.5"
+                                            },
+                                            "SensorType": {
+                                                "type": "string",
+                                                "example": "temperature"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -92,7 +114,41 @@
                     "200": {
                         "description": "Successful operation",
                         "schema": {
-                            "type": "array"
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "sensorId": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "airportIATA": {
+                                        "type": "string",
+                                        "example": "DBX"
+                                    },
+                                    "sensorType": {
+                                        "type": "string",
+                                        "example": "temperature"
+                                    },
+                                    "readings": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "timestamp": {
+                                                    "type": "string",
+                                                    "example": "2024-01-16T16:47:16.119Z"
+                                                },
+                                                "value": {
+                                                    "type": "number",
+                                                    "example": "24.08983"
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
